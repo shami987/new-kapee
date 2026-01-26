@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Star, Heart, Share2, Truck, Shield, RotateCcw, HelpCircle, Minus, Plus } from 'lucide-react';
+import { X, Star, Heart, Share2, Truck, HelpCircle, Minus, Plus } from 'lucide-react';
 import type { Product } from '../types';
 
 interface ProductDetailProps {
@@ -15,7 +15,7 @@ export const ProductDetail = ({ product, isOpen, onClose, onAddToCart }: Product
 
   if (!isOpen) return null;
 
-  const images = [product.image, product.image, product.image]; // Mock multiple images
+  const images = [product.image, product.image, product.image];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
