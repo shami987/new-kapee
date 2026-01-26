@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Star, Heart, Share2, Truck, Shield, RotateCcw, HelpCircle, Minus, Plus } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Star, Heart, Share2, Truck, HelpCircle, Minus, Plus } from 'lucide-react';
 import { Header } from '../components/Header';
 import { CartSidebar } from '../components/CartSidebar';
 import { products } from '../data/products';
@@ -8,7 +8,6 @@ import { useCart } from '../hooks/useCart';
 
 export const ProductDetailPage = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);

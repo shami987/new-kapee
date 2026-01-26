@@ -111,7 +111,7 @@ export const CartSidebar = ({
                 ></div>
               </div>
               <p className="text-sm text-gray-600 text-center">
-                Spend ${Math.max(0, (freeShippingThreshold - totalPrice).toFixed(2))} to get <span className="font-semibold text-blue-600">free shipping</span>
+                Spend ${Math.max(0, freeShippingThreshold - totalPrice).toFixed(2)} to get <span className="font-semibold text-blue-600">free shipping</span>
               </p>
             </div>
 

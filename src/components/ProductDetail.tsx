@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Star, Heart, Share2, Truck, Shield, RotateCcw, HelpCircle, Minus, Plus } from 'lucide-react';
+import { X, Star, Heart, Share2, Truck, HelpCircle, Minus, Plus } from 'lucide-react';
 import type { Product } from '../types';
 
 interface ProductDetailProps {

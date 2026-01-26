@@ -1,5 +1,4 @@
-import { ShoppingCart, User, Menu, ChevronDown, Search, Heart, X, Plus } from 'lucide-react';
-import { SearchBar } from './SearchBar';
+import { ShoppingCart, User, Menu, ChevronDown, Search, Heart, Plus } from 'lucide-react';
 import { LoginModal } from './LoginModal';
 import { useState } from 'react';
 

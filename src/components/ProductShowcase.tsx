@@ -8,7 +8,7 @@ interface ProductShowcaseProps {
   onAddToCart: (product: Product) => void;
 }
 
-export const ProductShowcase = ({ products, categories, onAddToCart }: ProductShowcaseProps) => {
+export const ProductShowcase = ({ products, onAddToCart }: ProductShowcaseProps) => {
   const [selectedCategory, setSelectedCategory] = useState('Men\'s Fashion');
   const [bannerIndex, setBannerIndex] = useState(0);
   
