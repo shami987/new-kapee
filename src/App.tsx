@@ -4,6 +4,7 @@ import { StickyNav } from './components/StickyNav';
 import { HeroBanner } from './components/HeroBanner';
 import { CategoryGrid } from './components/CategoryGrid';
 import { FeaturedProducts } from './components/FeaturedProducts';
+import { ProductShowcase } from './components/ProductShowcase';
 import { ProductCard } from './components/ProductCard';
 import { CartSidebar } from './components/CartSidebar';
 import { ProductFilters } from './components/ProductFilters';
@@ -115,10 +116,16 @@ function App() {
           }}
         />
         
+        <ProductShowcase 
+          products={products} 
+          categories={categories}
+          onAddToCart={addToCart}
+        />
+        
         <section className="py-16" data-products-section>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-center mb-12">
-              {searchQuery ? `Search Results for "${searchQuery}"` : 'Featured Products'}
+              {searchQuery ? `Search Results for "${searchQuery}"` : 'All Products'}
             </h2>
             
             <ProductFilters
