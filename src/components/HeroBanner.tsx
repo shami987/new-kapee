@@ -7,21 +7,21 @@ export const HeroBanner = () => {
   
   const slides = [
     {
-      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
-      subtitle: 'Festive Feast',
-      title: 'Fashion Accessories',
-      offer: 'Minimum 50% Off',
+      image: 'https://images.pexels.com/photos/8427641/pexels-photo-8427641.jpeg',
+      subtitle: 'NEW COLLECTIONS 2019',
+      title: 'MEN FASHION',
+      offer: 'Lorem ipsum dolor sit amet',
       price: '$39'
     },
     {
-      image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&h=600&fit=crop',
-      subtitle: 'Summer Collection',
-      title: 'Women\'s Fashion',
-      offer: 'Up to 70% Off',
+      image: 'https://media.istockphoto.com/id/905997400/photo/beautiful-woman.jpg?s=612x612&w=0&k=20&c=tdWKEEsmVQ9diojN1UPmAndXmEQbltmDx54PTcZBrxA=',
+      subtitle: 'NEW ARRIVALS',
+      title: 'SUMMER SALE',
+      offer: 'MIN.40% OFF',
       price: '$45'
     },
     {
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop',
+      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAEEB-WV5Jg23_A6tKxNT5UGokfk0SQdB9DQ&s',
       subtitle: 'New Arrivals',
       title: 'Men\'s Style',
       offer: 'Starting from $29',
@@ -141,32 +141,46 @@ export const HeroBanner = () => {
           {/* Right side banners */}
           <div className="space-y-4 md:space-y-6">
             {/* White Sneakers Banner */}
-            <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 md:p-6 relative overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 md:p-6 relative overflow-hidden h-40 md:h-48">
+              <div 
+                className="absolute inset-0"
+                style={{ 
+                  backgroundImage: 'url(https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0uYEAJX3b7hCbmYefUHBO9kAs82KvHK2Y0A&s)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
+              >
+                <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+              </div>
               <div className="relative z-10">
-                <div className="text-blue-500 font-semibold mb-2 text-sm md:text-base">WHITE SNEAKERS</div>
-                <div className="text-xl md:text-2xl font-bold text-gray-900 mb-2">MIN. 30% OFF</div>
-                <div className="text-gray-600 mb-4 text-sm md:text-base">Men Fashionable Shoes</div>
+                <div className="text-blue-200 font-semibold mb-2 text-sm md:text-base">WHITE SNEAKERS</div>
+                <div className="text-xl md:text-2xl font-bold text-white mb-2">MIN. 30% OFF</div>
+                <div className="text-gray-100 mb-4 text-sm md:text-base">Men Fashionable Shoes</div>
                 <button className="bg-blue-500 text-white px-4 md:px-6 py-2 rounded hover:bg-blue-600 transition-colors text-sm md:text-base">
                   SHOP NOW
                 </button>
-              </div>
-              <div className="absolute right-0 top-0 w-24 md:w-32 h-full flex items-center justify-center">
-                <span className="text-4xl md:text-6xl">👟</span>
               </div>
             </div>
 
             {/* Women's Fashion Banner */}
-            <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-4 md:p-6 relative overflow-hidden">
+            <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-4 md:p-6 relative overflow-hidden h-40 md:h-48">
+              <div 
+                className="absolute inset-0"
+                style={{ 
+                  backgroundImage: 'url(https://img.freepik.com/premium-photo/elegant-woman-accessories-hand-bag-high-heel-shoes_72402-2392.jpg)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
+              >
+                <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+              </div>
               <div className="relative z-10">
-                <div className="text-blue-500 font-semibold mb-2 text-sm md:text-base">WOMEN'S FASHION</div>
-                <div className="text-xl md:text-2xl font-bold text-gray-900 mb-2">UP TO 65% OFF</div>
-                <div className="text-gray-600 mb-4 text-sm md:text-base">Shoes & Backpacks</div>
+                <div className="text-blue-200 font-semibold mb-2 text-sm md:text-base">WOMEN'S FASHION</div>
+                <div className="text-xl md:text-2xl font-bold text-white mb-2">UP TO 65% OFF</div>
+                <div className="text-gray-100 mb-4 text-sm md:text-base">Shoes & Backpacks</div>
                 <button className="bg-blue-500 text-white px-4 md:px-6 py-2 rounded hover:bg-blue-600 transition-colors text-sm md:text-base">
                   SHOP NOW
                 </button>
-              </div>
-              <div className="absolute right-0 top-0 w-24 md:w-32 h-full flex items-center justify-center">
-                <span className="text-4xl md:text-6xl">👜</span>
               </div>
             </div>
           </div>

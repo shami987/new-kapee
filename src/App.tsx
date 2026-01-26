@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { StickyNav } from './components/StickyNav';
 import { HeroBanner } from './components/HeroBanner';
 import { CategoryGrid } from './components/CategoryGrid';
+import { FeaturedProducts } from './components/FeaturedProducts';
 import { ProductCard } from './components/ProductCard';
 import { CartSidebar } from './components/CartSidebar';
 import { ProductFilters } from './components/ProductFilters';
@@ -103,6 +104,16 @@ function App() {
       <main>
         <HeroBanner />
         <CategoryGrid categories={categories} />
+        <FeaturedProducts 
+          products={products} 
+          onAddToCart={addToCart}
+          onViewAll={() => {
+            const productsSection = document.querySelector('[data-products-section]');
+            if (productsSection) {
+              productsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+        />
         
         <section className="py-16" data-products-section>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

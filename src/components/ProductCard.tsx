@@ -5,9 +5,10 @@ import type { Product } from '../types';
 interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product) => void;
+  isFeatured?: boolean;
 }
 
-export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
+export const ProductCard = ({ product, onAddToCart, isFeatured }: ProductCardProps) => {
   const navigate = useNavigate();
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -38,6 +39,11 @@ export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
             e.currentTarget.src = 'https://via.placeholder.com/400x300?text=No+Image';
           }}
         />
+        {isFeatured && (
+          <span className="absolute top-2 left-2 bg-yellow-500 text-white px-3 py-1 text-xs font-bold rounded">
+            FEATURED
+          </span>
+        )}
         {product.isNew && (
           <span className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 text-xs rounded">
             New

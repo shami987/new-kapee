@@ -106,8 +106,44 @@ export const categories: Category[] = [
   },
   {
     id: 4,
-    name: "Accessories",
+    name: "Bags & Backpacks",
     image: "https://kapee.presslayouts.com/wp-content/uploads/2019/03/Bags-150x150.png",
+    productCount: 112
+  },
+  {
+    id: 5,
+    name: "Watches",
+    image: "https://kapee.presslayouts.com/wp-content/uploads/2019/03/Watch-150x150.jpg",
+    productCount: 85
+  },
+  {
+    id: 6,
+    name: "Jewellery",
+    image: "https://kapee.presslayouts.com/wp-content/uploads/2019/03/Jewellery-150x150.jpg",
+    productCount: 143
+  },
+  {
+    id: 7,
+    name: "Accessories",
+    image: "https://kapee.presslayouts.com/wp-content/uploads/2019/03/Accessories-150x150.jpg",
     productCount: 67
+  },
+  {
+    id: 8,
+    name: "Dresses",
+    image: "https://kapee.presslayouts.com/wp-content/uploads/2019/04/Women-Khaki-Solid-Top-150x150.jpg",
+    productCount: 98
+  },
+  {
+    id: 9,
+    name: "Tops",
+    image: "https://kapee.presslayouts.com/wp-content/uploads/2019/04/Women-Off-White-Printed-Top-5-150x150.jpg",
+    productCount: 121
+  },
+  {
+    id: 10,
+    name: "Lingerie & Nightwear",
+    image: "https://kapee.presslayouts.com/wp-content/uploads/2019/04/Women-Black-Solid-Maxi-Skirt-150x150.jpg",
+    productCount: 76
   }
 ];

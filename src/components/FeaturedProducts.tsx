@@ -1,18 +1,22 @@
-import type { Category } from '../types';
+import type { Product } from '../types';
 import { useRef } from 'react';
+import { ProductCard } from './ProductCard';
 
-interface CategoryGridProps {
-  categories: Category[];
+interface FeaturedProductsProps {
+  products: Product[];
+  onAddToCart: (product: Product) => void;
+  onViewAll?: () => void;
 }
 
-export const CategoryGrid = ({ categories }: CategoryGridProps) => {
-  const duplicatedCategories = categories;
-  
+export const FeaturedProducts = ({ products, onAddToCart, onViewAll }: FeaturedProductsProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Filter products that are marked as featured (isSale or isNew)
+  const featuredProducts = products.filter(p => p.isSale || p.isNew).slice(0, 10);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const scrollAmount = 300;
+      const scrollAmount = 400;
       scrollContainerRef.current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth'
@@ -21,9 +25,18 @@ export const CategoryGrid = ({ categories }: CategoryGridProps) => {
   };
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+        <div className="flex items-center justify-between mb-12">
+          <h2 className="text-3xl font-bold">FEATURED PRODUCTS</h2>
+          <button 
+            onClick={onViewAll}
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors font-semibold"
+          >
+            VIEW ALL
+          </button>
+        </div>
+
         {/* Carousel with navigation buttons */}
         <div className="relative flex items-center gap-4">
           {/* Previous Button */}
@@ -49,22 +62,15 @@ export const CategoryGrid = ({ categories }: CategoryGridProps) => {
             <style>{`
               ::-webkit-scrollbar { display: none; }
             `}</style>
-            <div className="flex gap-8 min-w-min px-4">
-              {duplicatedCategories.map((category, idx) => (
-                <button
-                  key={`${category.id}-${idx}`}
-                  className="flex flex-col items-center cursor-pointer group transition-all hover:scale-110 flex-shrink-0"
-                  onClick={() => console.log(`Filter by ${category.name}`)}
-                >
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-3 border-gray-300 group-hover:border-blue-500 shadow-lg group-hover:shadow-xl bg-white">
-                    <img
-                      src={category.image}
-                      alt={category.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="mt-3 font-semibold text-gray-900 text-center text-xs md:text-sm">{category.name}</h3>
-                </button>
+            <div className="flex gap-6 min-w-min px-4">
+              {featuredProducts.map((product) => (
+                <div key={product.id} className="flex-shrink-0 w-full sm:w-80">
+                  <ProductCard
+                    product={product}
+                    onAddToCart={onAddToCart}
+                    isFeatured={true}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -85,4 +91,4 @@ export const CategoryGrid = ({ categories }: CategoryGridProps) => {
   );
 };
 
-export default CategoryGrid;
+export default FeaturedProducts;
