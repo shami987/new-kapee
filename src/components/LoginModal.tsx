@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Eye, EyeOff } from 'lucide-react';
 
 interface LoginModalProps {
@@ -11,12 +11,28 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsVisible(true);
+    }
+  }, [isOpen]);
+
+  const handleClose = () => {
+    setIsVisible(false);
+    setTimeout(() => {
+      onClose();
+    }, 200);
+  };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex">
+      <div className={`bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex transform transition-transform duration-300 ease-out ${
+        isVisible ? 'translate-x-0' : '-translate-x-full'
+      }`}>
         {/* Left Side - Blue Section */}
         <div className="bg-blue-600 text-white p-8 flex-1 flex flex-col justify-center">
           <h2 className="text-4xl font-bold mb-6">Login</h2>
@@ -29,7 +45,7 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
         {/* Right Side - Form Section */}
         <div className="flex-1 p-8 relative">
           <button 
-            onClick={onClose}
+            onClick={handleClose}
             className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded"
           >
             <X className="h-6 w-6 text-gray-600" />
