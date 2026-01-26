@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Star, Heart, Share2, Truck, Shield, RotateCcw, HelpCircle, Minus, Plus } from 'lucide-react';
 import { Header } from '../components/Header';
+import { CartSidebar } from '../components/CartSidebar';
 import { products } from '../data/products';
 import { useCart } from '../hooks/useCart';
 
@@ -10,8 +11,9 @@ export const ProductDetailPage = () => {
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   
-  const { addToCart, getTotalItems } = useCart();
+  const { cartItems, addToCart, getTotalItems, removeFromCart, updateQuantity, getTotalPrice } = useCart();
   
   const product = products.find(p => p.id === Number(id));
   
@@ -25,8 +27,17 @@ export const ProductDetailPage = () => {
     <div className="min-h-screen bg-white">
       <Header
         cartItemsCount={getTotalItems}
-        onCartClick={() => {}}
+        onCartClick={() => setIsCartOpen(true)}
         onSearch={() => {}}
+      />
+      
+      <CartSidebar
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cartItems={cartItems}
+        onUpdateQuantity={updateQuantity}
+        onRemoveItem={removeFromCart}
+        totalPrice={getTotalPrice}
       />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -139,7 +150,10 @@ export const ProductDetailPage = () => {
                 </button>
               </div>
               <button 
-                onClick={() => addToCart(product, quantity)}
+                onClick={() => {
+                  addToCart(product, quantity);
+                  setIsCartOpen(true);
+                }}
                 className="bg-orange-500 text-white px-6 md:px-8 py-2 md:py-3 rounded font-medium hover:bg-orange-600 text-sm md:text-lg flex-1 sm:flex-none"
               >
                 ADD TO CART
