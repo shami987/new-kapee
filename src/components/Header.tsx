@@ -63,7 +63,7 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
           {/* Mobile Header */}
           <div className="flex items-center justify-between h-16 lg:hidden">
             <button 
-              onClick={() => setIsMobileMenuOpen(true)}
+              onClick={() => {setIsMobileMenuOpen(true); setActiveTab('menu');}}
               className="p-2"
             >
               <Menu className="h-6 w-6" />
@@ -206,7 +206,7 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setIsMobileMenuOpen(false)}></div>
+          <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => {setIsMobileMenuOpen(false); setActiveTab('menu');}}></div>
           <div className="fixed left-0 top-0 h-full w-80 bg-white">
             {/* Login Section */}
             <div className="bg-blue-600 text-white p-4">
@@ -221,49 +221,108 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
             
             {/* Menu Tabs */}
             <div className="flex bg-gray-100">
-              <button className="flex-1 py-3 text-blue-600 font-medium border-b-2 border-blue-600">MENU</button>
-              <button className="flex-1 py-3 text-gray-600 font-medium">CATEGORIES</button>
+              <button 
+                className={`flex-1 py-3 font-medium ${activeTab === 'menu' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'}`}
+                onClick={() => setActiveTab('menu')}
+              >
+                MENU
+              </button>
+              <button 
+                className={`flex-1 py-3 font-medium ${activeTab === 'categories' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-600'}`}
+                onClick={() => setActiveTab('categories')}
+              >
+                CATEGORIES
+              </button>
             </div>
             
             {/* Menu Items */}
             <div className="p-0">
-              <div className="border-b border-gray-200">
-                <div className="flex items-center justify-between p-4">
-                  <span className="font-medium text-gray-800">HOME</span>
-                  <Plus className="h-4 w-4 text-gray-400" />
-                </div>
-              </div>
-              
-              <div className="border-b border-gray-200">
-                <div className="p-4">
-                  <span className="font-medium text-gray-800">SHOP</span>
-                </div>
-              </div>
-              
-              <div className="border-b border-gray-200">
-                <div className="flex items-center justify-between p-4">
-                  <span className="font-medium text-gray-800">PAGES</span>
-                  <Plus className="h-4 w-4 text-gray-400" />
-                </div>
-              </div>
-              
-              <div className="border-b border-gray-200">
-                <div className="p-4">
-                  <span className="font-medium text-gray-800">BLOG</span>
-                </div>
-              </div>
-              
-              <div className="border-b border-gray-200">
-                <div className="p-4">
-                  <span className="font-medium text-gray-800">PORTFOLIO</span>
-                </div>
-              </div>
-              
-              <div className="border-b border-gray-200">
-                <div className="p-4">
-                  <span className="font-medium text-gray-800">ELEMENTS</span>
-                </div>
-              </div>
+              {activeTab === 'menu' ? (
+                <>
+                  <div className="border-b border-gray-200">
+                    <div className="flex items-center justify-between p-4">
+                      <span className="font-medium text-gray-800">HOME</span>
+                      <Plus className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
+                  
+                  <div className="border-b border-gray-200">
+                    <div className="p-4">
+                      <span className="font-medium text-gray-800">SHOP</span>
+                    </div>
+                  </div>
+                  
+                  <div className="border-b border-gray-200">
+                    <div className="flex items-center justify-between p-4">
+                      <span className="font-medium text-gray-800">PAGES</span>
+                      <Plus className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
+                  
+                  <div className="border-b border-gray-200">
+                    <div className="p-4">
+                      <span className="font-medium text-gray-800">BLOG</span>
+                    </div>
+                  </div>
+                  
+                  <div className="border-b border-gray-200">
+                    <div className="p-4">
+                      <span className="font-medium text-gray-800">PORTFOLIO</span>
+                    </div>
+                  </div>
+                  
+                  <div className="border-b border-gray-200">
+                    <div className="p-4">
+                      <span className="font-medium text-gray-800">ELEMENTS</span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="border-b border-gray-200">
+                    <div className="p-4">
+                      <span className="font-medium text-gray-800">MEN'S CLOTHING</span>
+                    </div>
+                  </div>
+                  
+                  <div className="border-b border-gray-200">
+                    <div className="p-4">
+                      <span className="font-medium text-gray-800">WOMEN'S CLOTHING</span>
+                    </div>
+                  </div>
+                  
+                  <div className="border-b border-gray-200">
+                    <div className="p-4">
+                      <span className="font-medium text-gray-800">ACCESSORIES</span>
+                    </div>
+                  </div>
+                  
+                  <div className="border-b border-gray-200">
+                    <div className="p-4">
+                      <span className="font-medium text-gray-800">SHOES</span>
+                    </div>
+                  </div>
+                  
+                  <div className="border-b border-gray-200">
+                    <div className="flex items-center justify-between p-4">
+                      <span className="font-medium text-gray-800">JEWELLERY</span>
+                      <Plus className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
+                  
+                  <div className="border-b border-gray-200">
+                    <div className="p-4">
+                      <span className="font-medium text-gray-800">BAGS & BACKPACKS</span>
+                    </div>
+                  </div>
+                  
+                  <div className="border-b border-gray-200">
+                    <div className="p-4">
+                      <span className="font-medium text-gray-800">WATCHES</span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
             
             {/* Language and Currency */}
