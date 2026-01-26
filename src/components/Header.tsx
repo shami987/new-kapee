@@ -76,7 +76,7 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
             </div>
             
             {/* Search Bar */}
-            <div className="flex-1 max-w-2xl mx-8">
+            <div className="flex-1 max-w-2xl mx-4 md:mx-8 hidden md:block">
               <div className="relative">
                 <div className="flex">
                   <input
@@ -85,7 +85,7 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
                     className="w-full px-4 py-3 text-gray-900 bg-white rounded-l-full focus:outline-none focus:ring-2 focus:ring-blue-300"
                     onChange={(e) => onSearch(e.target.value)}
                   />
-                  <select className="px-4 py-3 text-gray-700 bg-gray-100 border-l border-gray-300 focus:outline-none">
+                  <select className="px-4 py-3 text-gray-700 bg-gray-100 border-l border-gray-300 focus:outline-none hidden lg:block">
                     <option>All Categories</option>
                     <option>Electronics</option>
                     <option>Fashion</option>
@@ -99,14 +99,14 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
             </div>
 
             {/* Right Side */}
-            <div className="flex items-center space-x-6">
-              <div className="text-right">
+            <div className="flex items-center space-x-2 md:space-x-6">
+              <div className="text-right hidden md:block">
                 <div className="text-sm">HELLO,</div>
                 <div className="font-semibold">SIGN IN</div>
               </div>
               <User className="h-6 w-6" />
               
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-1 hidden md:flex">
                 <Heart className="h-6 w-6" />
                 <span className="bg-white text-blue-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">0</span>
               </div>
@@ -123,7 +123,7 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
                     </span>
                   )}
                 </div>
-                <div className="text-right">
+                <div className="text-right hidden md:block">
                   <div className="text-sm">{cartItemsCount} Cart</div>
                   <div className="font-semibold">$0.00</div>
                 </div>
@@ -136,33 +136,33 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
       {/* Navigation Menu */}
       <nav className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-14">
-            <div className="flex items-center space-x-1 bg-gray-100 px-4 py-2 rounded">
+          <div className="flex items-center h-14 overflow-x-auto">
+            <div className="flex items-center space-x-1 bg-gray-100 px-4 py-2 rounded flex-shrink-0">
               <Menu className="h-5 w-5 text-gray-600" />
-              <span className="font-semibold text-gray-800">SHOP BY DEPARTMENT</span>
+              <span className="font-semibold text-gray-800 text-sm md:text-base">SHOP BY DEPARTMENT</span>
             </div>
-            <div className="flex items-center space-x-8 ml-8">
-              <a href="#" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium">
-                <span>HOME</span>
+            <div className="flex items-center space-x-4 md:space-x-8 ml-4 md:ml-8">
+              <a href="#" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium whitespace-nowrap">
+                <span className="text-sm md:text-base">HOME</span>
                 <ChevronDown className="h-4 w-4" />
               </a>
-              <a href="#" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium">
-                <span>SHOP</span>
+              <a href="#" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium whitespace-nowrap">
+                <span className="text-sm md:text-base">SHOP</span>
                 <ChevronDown className="h-4 w-4" />
               </a>
-              <a href="#" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium">
-                <span>PAGES</span>
+              <a href="#" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium whitespace-nowrap hidden sm:flex">
+                <span className="text-sm md:text-base">PAGES</span>
                 <ChevronDown className="h-4 w-4" />
               </a>
-              <a href="#" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium">
-                <span>BLOG</span>
+              <a href="#" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium whitespace-nowrap hidden md:flex">
+                <span className="text-sm md:text-base">BLOG</span>
                 <ChevronDown className="h-4 w-4" />
               </a>
-              <a href="#" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium">
-                <span>ELEMENTS</span>
+              <a href="#" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium whitespace-nowrap hidden lg:flex">
+                <span className="text-sm md:text-base">ELEMENTS</span>
                 <ChevronDown className="h-4 w-4" />
               </a>
-              <a href="#" className="bg-orange-500 text-white px-4 py-2 rounded font-medium hover:bg-orange-600">
+              <a href="#" className="bg-orange-500 text-white px-3 md:px-4 py-2 rounded font-medium hover:bg-orange-600 text-sm md:text-base whitespace-nowrap">
                 BUY NOW
               </a>
             </div>

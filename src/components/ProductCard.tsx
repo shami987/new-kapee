@@ -1,4 +1,5 @@
 import { Star, ShoppingCart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import type { Product } from '../types';
 
 interface ProductCardProps {
@@ -7,7 +8,10 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
-  const handleAddToCart = () => {
+  const navigate = useNavigate();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
     try {
       onAddToCart(product);
     } catch (error) {
@@ -15,8 +19,15 @@ export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
     }
   };
 
+  const handleProductClick = () => {
+    navigate(`/product/${product.id}`);
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+    <div 
+      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+      onClick={handleProductClick}
+    >
       <div className="relative">
         <img
           src={product.image || 'https://via.placeholder.com/400x300?text=No+Image'}
