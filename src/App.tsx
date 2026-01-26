@@ -6,6 +6,8 @@ import { CategoryGrid } from './components/CategoryGrid';
 import { FeaturedProducts } from './components/FeaturedProducts';
 import { ProductShowcase } from './components/ProductShowcase';
 import WomenShowcase from './components/WomenShowcase';
+import PopularFashion from './components/PopularFashion';
+import FashionCategories from './components/FashionCategories';
 import { ProductCard } from './components/ProductCard';
 import { CartSidebar } from './components/CartSidebar';
 import { ProductFilters } from './components/ProductFilters';
@@ -123,6 +125,10 @@ function App() {
           onAddToCart={addToCart}
         />
         <WomenShowcase products={products} onAddToCart={addToCart} />
+        
+        <PopularFashion products={products} onAddToCart={addToCart} />
+        
+        <FashionCategories categories={categories} />
         
         <section className="py-16" data-products-section>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
