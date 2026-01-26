@@ -8,24 +8,6 @@ import { CartSidebar } from '../components/CartSidebar';
 import { useCart } from '../hooks/useCart';
 import { products, categories } from '../data/products';
 
-const footerLinks = {
-  quickLinks: [
-    { label: 'About Us', href: '#' },
-    { label: 'Contact', href: '#' },
-    { label: 'FAQ', href: '#' }
-  ],
-  categories: [
-    { label: 'Electronics', href: '#' },
-    { label: 'Fashion', href: '#' },
-    { label: 'Home & Garden', href: '#' }
-  ],
-  support: [
-    { label: 'Shipping Info', href: '#' },
-    { label: 'Returns', href: '#' },
-    { label: 'Privacy Policy', href: '#' }
-  ]
-};
-
 export const CategoryPage = () => {
   const { categoryName } = useParams();
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -146,7 +128,7 @@ export const CategoryPage = () => {
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         cartItems={cartItems}
-        onRemoveFromCart={removeFromCart}
+        onRemoveItem={removeFromCart}
         onUpdateQuantity={updateQuantity}
         totalPrice={getTotalPrice}
       />

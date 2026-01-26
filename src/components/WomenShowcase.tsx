@@ -1,5 +1,6 @@
 import type { Product } from '../types';
 import { ProductCard } from './ProductCard';
+import { useState, useEffect } from 'react';
 
 interface WomenShowcaseProps {
   products: Product[];
@@ -7,18 +8,30 @@ interface WomenShowcaseProps {
 }
 
 export const WomenShowcase = ({ products, onAddToCart }: WomenShowcaseProps) => {
-  // Customize these banner images (3 slides) as needed
+  const [bannerIndex, setBannerIndex] = useState(0);
+
+  // Customize these banner images and text
   const bannerSlides = [
-    'https://kapee.presslayouts.com/wp-content/uploads/2019/07/Product-box-banner-1.jpg',
-    'https://kapee.presslayouts.com/wp-content/uploads/2019/06/Product-box-banner-3.jpg',
-    'https://kapee.presslayouts.com/wp-content/uploads/2019/07/Product-box-banner-1.jpg'
+    {
+      image: 'https://kapee.presslayouts.com/wp-content/uploads/2019/07/Product-box-banner-4.jpg'
+    }
   ];
 
-  // pick the first banner by default
-  const bannerImage = bannerSlides[0];
+  // Auto-rotate banner every 4 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setBannerIndex((prev) => (prev + 1) % bannerSlides.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [bannerSlides.length]);
 
-  // take only women's fashion products
-  const womenProducts = products.filter(p => (p.category || '').toLowerCase() === "women's fashion");
+  // take women's-related products (match category or name keywords)
+  const womenKeywords = ['women', "women's", 'dress', 'dresses', 'tops', 'lingerie', 'skirt', 'skirts'];
+  const womenProducts = products.filter(p => {
+    const cat = (p.category || '').toLowerCase();
+    const name = (p.name || '').toLowerCase();
+    return womenKeywords.some(k => cat.includes(k) || name.includes(k));
+  });
   const displayProducts = womenProducts.slice(0, 6);
 
   return (
@@ -48,24 +61,38 @@ export const WomenShowcase = ({ products, onAddToCart }: WomenShowcaseProps) => 
           </div>
 
           {/* Center banner */}
-          <div className="lg:col-span-3">
-            <div
-              className="relative rounded-lg overflow-hidden h-96 bg-center bg-cover"
-              style={{ backgroundImage: `url(${bannerImage})` }}
-            >
-              <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-              <div className="absolute inset-0 flex items-center justify-center text-center text-white px-4">
-                <div>
-                  <h2 className="text-3xl font-bold mb-2">NEW ARRIVAL</h2>
-                  <p className="text-xl">UP TO 70% Off</p>
-                </div>
+          <div className="lg:col-span-2">
+            <div className="relative rounded-lg overflow-hidden h-96">
+              {/* Banner Carousel */}
+              <div className="relative w-full h-full">
+                {bannerSlides.map((slide, index) => (
+                  <div
+                    key={index}
+                    className={`absolute inset-0 transition-opacity duration-1000 ${
+                      index === bannerIndex ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    style={{
+                      backgroundImage: `url(${slide.image})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+                  </div>
+                ))}
               </div>
+
+              {/* Text Overlay - Hidden */}
+              <div className="hidden"></div>
+
+              {/* Carousel Indicators - Hidden */}
+              <div className="hidden"></div>
             </div>
           </div>
 
-          {/* Right products grid (6 items) */}
-          <div className="lg:col-span-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Right product cards — show first 6 in 2 rows (3 columns) */}
+          <div className="lg:col-span-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {displayProducts.map(product => (
                 <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} />
               ))}

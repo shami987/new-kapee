@@ -26,10 +26,10 @@ export const ProductCard = ({ product, onAddToCart, isFeatured }: ProductCardPro
 
   return (
     <div 
-      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-full"
       onClick={handleProductClick}
     >
-      <div className="relative">
+      <div className="relative flex-shrink-0">
         <img
           src={product.image || 'https://via.placeholder.com/400x300?text=No+Image'}
           alt={product.name || 'Product image'}
@@ -56,11 +56,11 @@ export const ProductCard = ({ product, onAddToCart, isFeatured }: ProductCardPro
         )}
       </div>
       
-      <div className="p-4">
+      <div className="p-4 flex flex-col flex-grow">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.name}</h3>
         <p className="text-sm text-gray-600 mb-2">{product.category}</p>
         
-        <div className="flex items-center mb-2">
+        <div className="flex items-center mb-3">
           <div className="flex items-center">
             {Array.from({ length: 5 }, (_, i) => (
               <Star
@@ -76,7 +76,7 @@ export const ProductCard = ({ product, onAddToCart, isFeatured }: ProductCardPro
           <span className="text-sm text-gray-600 ml-2">({product.reviews})</span>
         </div>
         
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-4 flex-grow items-end">
           <div className="flex items-center space-x-2">
             <span className="text-lg font-bold text-gray-900">${product.price}</span>
             {product.originalPrice && (
@@ -85,15 +85,15 @@ export const ProductCard = ({ product, onAddToCart, isFeatured }: ProductCardPro
               </span>
             )}
           </div>
-          
-          <button
-            onClick={handleAddToCart}
-            className="bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-1"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            <span>Add</span>
-          </button>
         </div>
+        
+        <button
+          onClick={handleAddToCart}
+          className="w-full bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center space-x-1"
+        >
+          <ShoppingCart className="h-4 w-4" />
+          <span>Add</span>
+        </button>
       </div>
     </div>
   );
