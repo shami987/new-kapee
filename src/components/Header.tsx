@@ -12,6 +12,7 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
   const [currency, setCurrency] = useState('$ Dollar (US)');
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('menu');
 
   return (
     <>
