@@ -1,11 +1,13 @@
 import type { Category } from '../types';
 import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface CategoryGridProps {
   categories: Category[];
 }
 
 export const CategoryGrid = ({ categories }: CategoryGridProps) => {
+  const navigate = useNavigate();
   const duplicatedCategories = categories;
   
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -54,7 +56,7 @@ export const CategoryGrid = ({ categories }: CategoryGridProps) => {
                 <button
                   key={`${category.id}-${idx}`}
                   className="flex flex-col items-center cursor-pointer group transition-all hover:scale-110 flex-shrink-0"
-                  onClick={() => console.log(`Filter by ${category.name}`)}
+                  onClick={() => navigate(`/category/${category.name.toLowerCase().replace(/\s+/g, '-')}`)}
                 >
                   <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-3 border-gray-300 group-hover:border-blue-500 shadow-lg group-hover:shadow-xl bg-white">
                     <img
