@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Header } from './components/Header';
 import { StickyNav } from './components/StickyNav';
 import { HeroBanner } from './components/HeroBanner';
@@ -6,6 +6,7 @@ import { CategoryGrid } from './components/CategoryGrid';
 import { ProductCard } from './components/ProductCard';
 import { CartSidebar } from './components/CartSidebar';
 import { ProductFilters } from './components/ProductFilters';
+import { SignupModal } from './components/SignupModal';
 import { useCart } from './hooks/useCart';
 import { products, categories } from './data/products';
 
@@ -30,6 +31,7 @@ const footerLinks = {
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
   const [filters, setFilters] = useState({
     category: '',
     priceRange: [0, 1000] as [number, number],
@@ -44,6 +46,15 @@ function App() {
     getTotalPrice,
     getTotalItems
   } = useCart();
+
+  // Show signup modal after 10 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsSignupModalOpen(true);
+    }, 10000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredProducts = useMemo(() => {
     let filtered = products.filter(product => {
@@ -168,6 +179,11 @@ function App() {
         onUpdateQuantity={updateQuantity}
         onRemoveItem={removeFromCart}
         totalPrice={getTotalPrice}
+      />
+
+      <SignupModal
+        isOpen={isSignupModalOpen}
+        onClose={() => setIsSignupModalOpen(false)}
       />
     </div>
   );

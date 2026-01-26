@@ -31,7 +31,7 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className={`bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex transform transition-transform duration-300 ease-out ${
-        isVisible ? 'translate-x-0' : '-translate-x-full'
+        isVisible ? 'translate-x-0' : (isOpen ? '-translate-x-full' : 'translate-x-full')
       }`}>
         {/* Left Side - Blue Section */}
         <div className="bg-blue-600 text-white p-8 flex-1 flex flex-col justify-center">
