@@ -1,5 +1,6 @@
 import { ShoppingCart, User, Menu, ChevronDown, Search, Heart, X, Plus } from 'lucide-react';
 import { SearchBar } from './SearchBar';
+import { LoginModal } from './LoginModal';
 import { useState } from 'react';
 
 interface HeaderProps {
@@ -13,6 +14,7 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('menu');
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   return (
     <>
@@ -136,11 +138,16 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
             </div>
 
             <div className="flex items-center space-x-6">
-              <div className="text-right">
-                <div className="text-sm">HELLO,</div>
-                <div className="font-semibold">SIGN IN</div>
-              </div>
-              <User className="h-6 w-6" />
+              <button 
+                onClick={() => setIsLoginModalOpen(true)}
+                className="flex items-center space-x-2 bg-blue-700 px-4 py-2 rounded hover:bg-blue-800 transition-colors"
+              >
+                <User className="h-5 w-5" />
+                <div className="text-left">
+                  <div className="text-xs">HELLO,</div>
+                  <div className="text-sm font-semibold">SIGN IN</div>
+                </div>
+              </button>
               
               <div className="flex items-center space-x-1">
                 <Heart className="h-6 w-6" />
@@ -210,13 +217,16 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
           <div className="fixed left-0 top-0 h-full w-80 bg-white">
             {/* Login Section */}
             <div className="bg-blue-600 text-white p-4">
-              <div className="flex items-center justify-between">
+              <button 
+                onClick={() => setIsLoginModalOpen(true)}
+                className="flex items-center justify-between w-full"
+              >
                 <div className="flex items-center space-x-2">
                   <User className="h-5 w-5" />
                   <span className="font-medium">Login/Signup</span>
                 </div>
                 <ChevronDown className="h-4 w-4 rotate-90" />
-              </div>
+              </button>
             </div>
             
             {/* Menu Tabs */}
@@ -341,6 +351,11 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
           </div>
         </div>
       )}
+      
+      <LoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)} 
+      />
     </>
   );
 };

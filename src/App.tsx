@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Header } from './components/Header';
+import { StickyNav } from './components/StickyNav';
 import { HeroBanner } from './components/HeroBanner';
 import { CategoryGrid } from './components/CategoryGrid';
 import { ProductCard } from './components/ProductCard';
@@ -81,6 +82,11 @@ function App() {
         cartItemsCount={getTotalItems}
         onCartClick={() => setIsCartOpen(true)}
         onSearch={setSearchQuery}
+      />
+      
+      <StickyNav
+        cartItemsCount={getTotalItems}
+        onCartClick={() => setIsCartOpen(true)}
       />
       
       <main>
