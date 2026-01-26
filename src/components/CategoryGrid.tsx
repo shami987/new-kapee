@@ -6,7 +6,7 @@ interface CategoryGridProps {
 
 export const CategoryGrid = ({ categories }: CategoryGridProps) => {
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-3xl font-bold text-center mb-12">Shop by Category</h2>
         
@@ -14,7 +14,7 @@ export const CategoryGrid = ({ categories }: CategoryGridProps) => {
           {categories.map((category) => (
             <button
               key={category.id}
-              className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow text-left w-full"
+              className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all hover:scale-105 text-left w-full border border-gray-200"
               onClick={() => console.log(`Filter by ${category.name}`)}
             >
               <img
@@ -24,7 +24,7 @@ export const CategoryGrid = ({ categories }: CategoryGridProps) => {
               />
               <div className="p-4 text-center">
                 <h3 className="font-semibold text-gray-900">{category.name}</h3>
-                <p className="text-sm text-gray-600">{category.productCount} items</p>
+                <p className="text-sm text-blue-600">{category.productCount} items</p>
               </div>
             </button>
           ))}

@@ -1,5 +1,6 @@
-import { ShoppingCart, User, Menu } from 'lucide-react';
+import { ShoppingCart, User, Menu, ChevronDown, Search, Heart } from 'lucide-react';
 import { SearchBar } from './SearchBar';
+import { useState } from 'react';
 
 interface HeaderProps {
   cartItemsCount: number;
@@ -8,56 +9,166 @@ interface HeaderProps {
 }
 
 export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) => {
-  return (
-    <header className="bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
-            <div className="flex items-center" aria-label="Main navigation">
-              <button
-                className="md:hidden"
-                aria-label="Open menu"
-                type="button"
-              >
-                <Menu className="h-6 w-6" />
-              </button>
-              <a href="/" className="ml-2">
-                <h1 className="text-2xl font-bold text-gray-900">Kapee</h1>
-              </a>
-            </div>
-          </div>
-          
-          <nav className="hidden md:flex space-x-8">
-            <a href="#" className="text-gray-700 hover:text-gray-900">Home</a>
-            <a href="#" className="text-gray-700 hover:text-gray-900">Shop</a>
-            <a href="#" className="text-gray-700 hover:text-gray-900">Categories</a>
-            <a href="#" className="text-gray-700 hover:text-gray-900">About</a>
-            <a href="#" className="text-gray-700 hover:text-gray-900">Contact</a>
-          </nav>
+  const [currency, setCurrency] = useState('$ DOLLAR (US)');
+  const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
 
-          <div className="flex items-center space-x-4">
-            <SearchBar onSearch={onSearch} />
-            <button
-              type="button"
-              aria-label="User account"
-              className="p-2 text-gray-600 hover:text-gray-900"
-            >
-              <User className="h-5 w-5" />
-            </button>
-            <button
-              onClick={onCartClick}
-              className="relative p-2 text-gray-600 hover:text-gray-900"
-            >
-              <ShoppingCart className="h-5 w-5" />
-              {cartItemsCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {cartItemsCount}
-                </span>
-              )}
-            </button>
+  return (
+    <>
+      {/* Top Header Bar */}
+      <div className="bg-blue-600 text-white text-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-10">
+            <div className="flex items-center space-x-6">
+              <div className="relative">
+                <button 
+                  className="flex items-center space-x-1 hover:text-blue-200"
+                  onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
+                >
+                  <span>ENGLISH</span>
+                  <ChevronDown className="h-3 w-3" />
+                </button>
+              </div>
+              <div className="relative">
+                <button 
+                  className="flex items-center space-x-1 hover:text-blue-200"
+                  onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
+                >
+                  <span>{currency}</span>
+                  <ChevronDown className="h-3 w-3" />
+                </button>
+                {showCurrencyDropdown && (
+                  <div className="absolute top-full left-0 mt-1 bg-white text-gray-800 rounded shadow-lg z-50 min-w-40">
+                    <button className="block w-full text-left px-3 py-2 hover:bg-gray-100" onClick={() => {setCurrency('₹ RUPEE (INR)'); setShowCurrencyDropdown(false);}}>
+                      ₹ RUPEE (INR)
+                    </button>
+                    <button className="block w-full text-left px-3 py-2 hover:bg-gray-100" onClick={() => {setCurrency('$ DOLLAR (US)'); setShowCurrencyDropdown(false);}}>
+                      $ DOLLAR (US)
+                    </button>
+                    <button className="block w-full text-left px-3 py-2 hover:bg-gray-100" onClick={() => {setCurrency('£ Pound (UK)'); setShowCurrencyDropdown(false);}}>
+                      £ Pound (UK)
+                    </button>
+                    <button className="block w-full text-left px-3 py-2 hover:bg-gray-100" onClick={() => {setCurrency('€ Euro (EUR)'); setShowCurrencyDropdown(false);}}>
+                      € Euro (EUR)
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center space-x-6 text-xs">
+              <span>WELCOME TO OUR STORE!</span>
+              <a href="#" className="hover:text-blue-200">📝 BLOG</a>
+              <a href="#" className="hover:text-blue-200">❓ FAQ</a>
+              <a href="#" className="hover:text-blue-200">✉️ CONTACT US</a>
+            </div>
           </div>
         </div>
       </div>
-    </header>
+
+      {/* Main Header */}
+      <header className="bg-blue-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-20">
+            {/* Logo */}
+            <div className="flex items-center">
+              <a href="/" className="text-3xl font-bold text-white">
+                kapee.
+              </a>
+            </div>
+            
+            {/* Search Bar */}
+            <div className="flex-1 max-w-2xl mx-8">
+              <div className="relative">
+                <div className="flex">
+                  <input
+                    type="text"
+                    placeholder="Search for products, categories, brands, sku..."
+                    className="w-full px-4 py-3 text-gray-900 bg-white rounded-l-full focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    onChange={(e) => onSearch(e.target.value)}
+                  />
+                  <select className="px-4 py-3 text-gray-700 bg-gray-100 border-l border-gray-300 focus:outline-none">
+                    <option>All Categories</option>
+                    <option>Electronics</option>
+                    <option>Fashion</option>
+                    <option>Home & Garden</option>
+                  </select>
+                  <button className="px-6 py-3 bg-orange-500 text-white rounded-r-full hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-300">
+                    <Search className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side */}
+            <div className="flex items-center space-x-6">
+              <div className="text-right">
+                <div className="text-sm">HELLO,</div>
+                <div className="font-semibold">SIGN IN</div>
+              </div>
+              <User className="h-6 w-6" />
+              
+              <div className="flex items-center space-x-1">
+                <Heart className="h-6 w-6" />
+                <span className="bg-white text-blue-600 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold">0</span>
+              </div>
+              
+              <button
+                onClick={onCartClick}
+                className="flex items-center space-x-2"
+              >
+                <div className="relative">
+                  <ShoppingCart className="h-6 w-6" />
+                  {cartItemsCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                      {cartItemsCount}
+                    </span>
+                  )}
+                </div>
+                <div className="text-right">
+                  <div className="text-sm">{cartItemsCount} Cart</div>
+                  <div className="font-semibold">$0.00</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Navigation Menu */}
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center h-14">
+            <div className="flex items-center space-x-1 bg-gray-100 px-4 py-2 rounded">
+              <Menu className="h-5 w-5 text-gray-600" />
+              <span className="font-semibold text-gray-800">SHOP BY DEPARTMENT</span>
+            </div>
+            <div className="flex items-center space-x-8 ml-8">
+              <a href="#" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium">
+                <span>HOME</span>
+                <ChevronDown className="h-4 w-4" />
+              </a>
+              <a href="#" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium">
+                <span>SHOP</span>
+                <ChevronDown className="h-4 w-4" />
+              </a>
+              <a href="#" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium">
+                <span>PAGES</span>
+                <ChevronDown className="h-4 w-4" />
+              </a>
+              <a href="#" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium">
+                <span>BLOG</span>
+                <ChevronDown className="h-4 w-4" />
+              </a>
+              <a href="#" className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium">
+                <span>ELEMENTS</span>
+                <ChevronDown className="h-4 w-4" />
+              </a>
+              <a href="#" className="bg-orange-500 text-white px-4 py-2 rounded font-medium hover:bg-orange-600">
+                BUY NOW
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </>
   );
 };
