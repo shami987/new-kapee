@@ -4,7 +4,7 @@ import { useCart } from '../hooks/useCart';
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
-  const { cartItems, getTotalPrice } = useCart();
+  const { cartItems, getTotalPrice, clearCart } = useCart();
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -20,6 +20,9 @@ export const CheckoutPage = () => {
     email: ''
   });
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -30,10 +33,43 @@ export const CheckoutPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the order data to your backend
-    console.log('Order placed:', { ...formData, items: cartItems, total: getTotalPrice });
-    // Navigate to order complete page
-    navigate('/order-complete');
+    
+    // Validate form
+    const newErrors: Record<string, string> = {};
+    
+    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!formData.address.trim()) newErrors.address = 'Address is required';
+    if (!formData.city.trim()) newErrors.city = 'City is required';
+    if (!formData.zipCode.trim()) newErrors.zipCode = 'ZIP code is required';
+    if (!formData.phone.trim()) newErrors.phone = 'Phone is required';
+    if (!formData.email.trim()) newErrors.email = 'Email is required';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Valid email is required';
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    
+    setErrors({});
+    setIsSubmitting(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      // Log order data
+      console.log('Order placed:', { 
+        ...formData, 
+        items: cartItems, 
+        total: getTotalPrice 
+      });
+      
+      // Clear the cart
+      clearCart();
+      
+      // Navigate to order complete page
+      setIsSubmitting(false);
+      navigate('/order-complete');
+    }, 1000);
   };
 
   const shippingCost = 5.00;
@@ -92,8 +128,11 @@ export const CheckoutPage = () => {
                     value={formData.firstName}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      errors.firstName ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   />
+                  {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -105,8 +144,11 @@ export const CheckoutPage = () => {
                     value={formData.lastName}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      errors.lastName ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   />
+                  {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
                 </div>
               </div>
 
@@ -310,9 +352,10 @@ export const CheckoutPage = () => {
               {/* Place Order Button */}
               <button
                 onClick={handleSubmit}
-                className="w-full bg-orange-500 text-white py-3 rounded font-bold hover:bg-orange-600 transition-colors"
+                disabled={isSubmitting}
+                className="w-full bg-orange-500 text-white py-3 rounded font-bold hover:bg-orange-600 transition-colors disabled:bg-orange-300 disabled:cursor-not-allowed"
               >
-                PLACE ORDER
+                {isSubmitting ? 'PLACING ORDER...' : 'PLACE ORDER'}
               </button>
             </div>
           </div>

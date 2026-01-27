@@ -51,12 +51,17 @@ export const useCart = () => {
     [cartItems]
   );
 
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
   return {
     cartItems,
     addToCart,
     removeFromCart,
     updateQuantity,
     getTotalPrice,
-    getTotalItems
+    getTotalItems,
+    clearCart
   };
 };

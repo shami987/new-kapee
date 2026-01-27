@@ -6,6 +6,7 @@ import App from './App.tsx'
 import { ProductDetailPage } from './pages/ProductDetailPage.tsx'
 import { CategoryPage } from './pages/CategoryPage.tsx'
 import { CheckoutPage } from './pages/CheckoutPage.tsx'
+import { OrderCompletePage } from './pages/OrderCompletePage.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -15,6 +16,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/category/:categoryName" element={<CategoryPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/order-complete" element={<OrderCompletePage />} />
         <Route path="/"></Route>
       </Routes>
     </BrowserRouter>
