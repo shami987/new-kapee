@@ -3,7 +3,6 @@ import { useState, useMemo } from 'react';
 import { Header } from '../components/Header';
 import { StickyNav } from '../components/StickyNav';
 import { ProductCard } from '../components/ProductCard';
-import { ProductShowcase } from '../components/ProductShowcase';
 import { CartSidebar } from '../components/CartSidebar';
 import { useCart } from '../hooks/useCart';
 import { products, categories } from '../data/products';
@@ -115,13 +114,6 @@ export const CategoryPage = () => {
           </div>
         </div>
       </main>
-
-      {/* Product Showcase Section */}
-      <ProductShowcase 
-        products={products}
-        categories={categories}
-        onAddToCart={addToCart}
-      />
 
       {/* Cart Sidebar */}
       <CartSidebar
