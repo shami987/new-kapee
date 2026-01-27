@@ -83,43 +83,7 @@ export const products: Product[] = [
     reviews: 203,
     isNew: true
   },
-  {
-    id: 9,
-    name: "Floral Summer Dress",
-    price: 49.99,
-    image: "https://kapee.presslayouts.com/wp-content/uploads/2019/04/Women-Blue-Skinny-Fit-Stretchable-Jeans-2-430x502.jpg",
-    category: "Women's Fashion",
-    rating: 4.5,
-    reviews: 45,
-    isNew: true
-  },
-  {
-    id: 10,
-    name: "Cotton Casual Top",
-    price: 34.99,
-    image: "https://kapee.presslayouts.com/wp-content/uploads/2019/04/Women-Off-White-Printed-Blouson-Top.jpg",
-    category: "Women's Fashion",
-    rating: 4.2,
-    reviews: 30
-  },
-  {
-    id: 11,
-    name: "Women's Casual Sandals",
-    price: 59.99,
-    image: "https://kapee.presslayouts.com/wp-content/uploads/2019/04/Women-Black-Solid-Maxi-Skirt-150x150.jpg",
-    category: "Women's Fashion",
-    rating: 4.1,
-    reviews: 18
-  },
-  {
-    id: 12,
-    name: "Denim Mini Skirt",
-    price: 44.99,
-    image: "https://kapee.presslayouts.com/wp-content/uploads/2019/04/Women-Khaki-Solid-Top-150x150.jpg",
-    category: "Women's Fashion",
-    rating: 4.0,
-    reviews: 22
-  }
+  
 ];
 
 export const categories: Category[] = [
