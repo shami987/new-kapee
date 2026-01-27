@@ -1,5 +1,6 @@
 import { ShoppingCart, User, Menu, ChevronDown, Search, Heart, Plus } from 'lucide-react';
 import { LoginModal } from './LoginModal';
+import { SignupModal } from './SignupModal';
 import { useState } from 'react';
 
 interface HeaderProps {
@@ -14,6 +15,7 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('menu');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
 
   return (
     <>
@@ -353,7 +355,20 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
       
       <LoginModal 
         isOpen={isLoginModalOpen} 
-        onClose={() => setIsLoginModalOpen(false)} 
+        onClose={() => setIsLoginModalOpen(false)}
+        onSwitchToSignup={() => {
+          setIsLoginModalOpen(false);
+          setIsSignupModalOpen(true);
+        }}
+      />
+      
+      <SignupModal 
+        isOpen={isSignupModalOpen} 
+        onClose={() => setIsSignupModalOpen(false)}
+        onSwitchToLogin={() => {
+          setIsSignupModalOpen(false);
+          setIsLoginModalOpen(true);
+        }}
       />
     </>
   );

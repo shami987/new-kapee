@@ -57,7 +57,7 @@ export const FashionCategories = ({ categories }: FashionCategoriesProps) => {
           {/* Center - Large Banner */}
           <div className="lg:col-span-2">
             <div
-              className="relative rounded-lg overflow-hidden h-80 bg-center bg-cover"
+              className="relative rounded-lg overflow-hidden h-96 bg-center bg-cover"
               style={{ backgroundImage: `url(${bannerImage})` }}
             >
               <div className="absolute inset-0 bg-black bg-opacity-40"></div>
@@ -74,14 +74,14 @@ export const FashionCategories = ({ categories }: FashionCategoriesProps) => {
               {displayCategories.map((cat) => (
                 <div
                   key={cat.id}
-                  className="bg-gray-50 rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                  className="bg-gray-50 rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col"
                 >
                   <img
                     src={cat.image}
                     alt={cat.name}
-                    className="w-full h-40 object-cover"
+                    className="w-full h-24 object-cover"
                   />
-                  <div className="p-4 text-center">
+                  <div className="p-4 text-center flex-1 flex flex-col justify-center">
                     <h4 className="text-lg font-semibold text-gray-900 mb-1">{cat.name}</h4>
                     <p className="text-sm text-gray-600">{cat.productCount} PRODUCTS</p>
                   </div>

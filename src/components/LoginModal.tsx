@@ -4,9 +4,10 @@ import { X, Eye, EyeOff } from 'lucide-react';
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSwitchToSignup?: () => void;
 }
 
-export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
+export const LoginModal = ({ isOpen, onClose, onSwitchToSignup }: LoginModalProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -97,6 +98,21 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
             <button className="w-full bg-blue-600 text-white py-3 rounded font-medium hover:bg-blue-700 transition-colors">
               LOG IN
             </button>
+
+            <div className="mt-6 text-center">
+              <p className="text-gray-600 mb-3">
+                New to our platform?
+              </p>
+              <button 
+                onClick={() => {
+                  handleClose();
+                  onSwitchToSignup?.();
+                }}
+                className="w-full bg-white border-2 border-blue-600 text-blue-600 py-3 rounded font-medium hover:bg-blue-50 transition-colors"
+              >
+                CREATE AN ACCOUNT
+              </button>
+            </div>
           </div>
         </div>
       </div>
