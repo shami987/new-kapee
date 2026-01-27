@@ -35,12 +35,6 @@ export const SignupModal = ({ isOpen, onClose, onSwitchToLogin }: SignupModalPro
     }, 200);
   };
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      handleClose();
-    }
-  };
-
   if (!isOpen) return null;
 
   return (

@@ -1,4 +1,5 @@
 import { X, Plus, Minus, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import type { CartItem } from '../types';
 
 interface CartSidebarProps {
@@ -18,6 +19,7 @@ export const CartSidebar = ({
   onRemoveItem,
   totalPrice
 }: CartSidebarProps) => {
+  const navigate = useNavigate();
   if (!isOpen) return null;
 
   const freeShippingThreshold = 120;
@@ -119,7 +121,13 @@ export const CartSidebar = ({
             <button className="w-full bg-blue-600 text-white py-3 rounded font-bold hover:bg-blue-700 transition-colors">
               VIEW CART
             </button>
-            <button className="w-full bg-orange-500 text-white py-3 rounded font-bold hover:bg-orange-600 transition-colors">
+            <button 
+              onClick={() => {
+                onClose();
+                navigate('/checkout');
+              }}
+              className="w-full bg-orange-500 text-white py-3 rounded font-bold hover:bg-orange-600 transition-colors"
+            >
               CHECKOUT
             </button>
           </div>
