@@ -22,7 +22,7 @@ export const PopularFashion = ({ products, onAddToCart, onLoginRequired }: Popul
     'Bags & Backpacks'
   ];
 
-  // Get first 8 products for display (4 columns × 2 rows)
+
   const displayProducts = products.slice(0, 8);
 
   return (
