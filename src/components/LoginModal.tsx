@@ -105,7 +105,7 @@ export const LoginModal = ({ isOpen, onClose, onSwitchToSignup }: LoginModalProp
         }
       }}
     >
-      {/* Modal container - responsive width and height */}
+     
       <div className={`bg-white rounded-lg w-full max-w-4xl max-h-[95vh] overflow-hidden flex flex-col md:flex-row transform transition-transform duration-300 ease-out ${
         isVisible ? 'translate-x-0' : (isOpen ? '-translate-x-full' : 'translate-x-full')
       }`}>
