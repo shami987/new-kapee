@@ -9,18 +9,23 @@ interface FeaturedProductsProps {
   onViewAll?: () => void;
 }
 
-export const FeaturedProducts = ({ products, onAddToCart, onLoginRequired, onViewAll }: FeaturedProductsProps) => {
+export const FeaturedProducts = ({
+  products,
+  onAddToCart,
+  onLoginRequired,
+  onViewAll,
+}: FeaturedProductsProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  
-  // Filter products that are marked as featured (isSale or isNew)
-  const featuredProducts = products.filter(p => p.isSale || p.isNew).slice(0, 10);
+
+  // Filter featured products
+  const featuredProducts = products.filter((p) => p.isSale || p.isNew).slice(0, 10);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const scrollAmount = 400;
+      const scrollAmount = scrollContainerRef.current.clientWidth * 0.8; // scroll 80% of container width
       scrollContainerRef.current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
   };
@@ -28,25 +33,31 @@ export const FeaturedProducts = ({ products, onAddToCart, onLoginRequired, onVie
   return (
     <section className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-12">
-          <h2 className="text-3xl font-bold">FEATURED PRODUCTS</h2>
-          <button 
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 sm:mb-12 gap-4">
+          <h2 className="text-2xl sm:text-3xl font-bold">FEATURED PRODUCTS</h2>
+          <button
             onClick={onViewAll}
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors font-semibold"
+            className="bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded hover:bg-blue-700 transition-colors font-semibold text-sm sm:text-base"
           >
             VIEW ALL
           </button>
         </div>
 
-        {/* Carousel with navigation buttons */}
-        <div className="relative flex items-center gap-4">
-          {/* Previous Button */}
+        {/* Carousel */}
+        <div className="relative flex items-center">
+          {/* Prev Button */}
           <button
             onClick={() => scroll('left')}
-            className="flex-shrink-0 bg-white border border-gray-300 rounded-full p-2 md:p-3 hover:bg-gray-100 hover:border-blue-500 transition-all shadow-md z-10"
+            className="absolute left-0 z-10 bg-white border border-gray-300 rounded-full p-2 sm:p-3 hover:bg-gray-100 hover:border-blue-500 transition-all shadow-md"
             aria-label="Previous"
           >
-            <svg className="w-5 h-5 md:w-6 md:h-6 text-gray-600 hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600 hover:text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -54,18 +65,19 @@ export const FeaturedProducts = ({ products, onAddToCart, onLoginRequired, onVie
           {/* Scrollable Container */}
           <div
             ref={scrollContainerRef}
-            className="overflow-x-auto pb-2 flex-1 scroll-smooth"
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none'
-            }}
+            className="overflow-x-auto scroll-smooth flex gap-4 sm:gap-6 py-2"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             <style>{`
               ::-webkit-scrollbar { display: none; }
             `}</style>
-            <div className="flex gap-6 min-w-min px-4">
+
+            <div className="flex gap-4 sm:gap-6">
               {featuredProducts.map((product) => (
-                <div key={product.id} className="flex-shrink-0 w-full sm:w-80">
+                <div
+                  key={product.id}
+                  className="flex-shrink-0 w-64 sm:w-72 md:w-80 lg:w-72 xl:w-80"
+                >
                   <ProductCard
                     product={product}
                     onAddToCart={onAddToCart}
@@ -80,10 +92,15 @@ export const FeaturedProducts = ({ products, onAddToCart, onLoginRequired, onVie
           {/* Next Button */}
           <button
             onClick={() => scroll('right')}
-            className="flex-shrink-0 bg-white border border-gray-300 rounded-full p-2 md:p-3 hover:bg-gray-100 hover:border-blue-500 transition-all shadow-md z-10"
+            className="absolute right-0 z-10 bg-white border border-gray-300 rounded-full p-2 sm:p-3 hover:bg-gray-100 hover:border-blue-500 transition-all shadow-md"
             aria-label="Next"
           >
-            <svg className="w-5 h-5 md:w-6 md:h-6 text-gray-600 hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600 hover:text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>

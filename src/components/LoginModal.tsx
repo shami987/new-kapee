@@ -2,114 +2,108 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Eye, EyeOff, LogIn } from 'lucide-react';
 import { useLogin } from '../hooks/useLogin';
 
-// Props interface for LoginModal component
 interface LoginModalProps {
-  isOpen: boolean;              // Controls whether modal is visible
-  onClose: () => void;          // Called when user closes the modal
-  onSwitchToSignup?: () => void; // Called when user clicks "Sign Up" button
+  isOpen: boolean;
+  onClose: () => void;
+  onSwitchToSignup?: () => void;
 }
 
 export const LoginModal = ({ isOpen, onClose, onSwitchToSignup }: LoginModalProps) => {
-  // Ref to focus email input from icon click
   const emailInputRef = useRef<HTMLInputElement>(null);
-  
-  // UI state for password visibility
   const [showPassword, setShowPassword] = useState(false);
-  
-  // Form field states - stores what user types
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  
-  // Animation state for smooth modal transitions
+
+  // INTERNAL STATE: Controls modal visibility independently
+  const [internalOpen, setInternalOpen] = useState(isOpen);
   const [isVisible, setIsVisible] = useState(false);
-  
-  // Local error messages from client-side validation
+
   const [localError, setLocalError] = useState('');
+  const [persistentError, setPersistentError] = useState('');
 
-  // React Query hook for login - provides login function and loading/error states
-  const { mutate: login, isPending, error } = useLogin();
+  const { mutate: login, isPending } = useLogin();
 
-  // Effect: Run when isOpen changes to trigger animation
+  // Sync internalOpen when parent opens the modal
   useEffect(() => {
     if (isOpen) {
-      setIsVisible(true);
+      setInternalOpen(true);
+      setTimeout(() => setIsVisible(true), 20); // trigger animation
     }
   }, [isOpen]);
 
-  // Close modal and reset all form fields
+  // Close modal function
   const handleClose = () => {
-    // Trigger closing animation
-    setIsVisible(false);
-    
-    // Clear all form fields
-    setEmail('');
-    setPassword('');
-    setRememberMe(false);
-    setLocalError('');
-    
-    // Wait for animation before actually closing modal
+    setIsVisible(false); // trigger slide-out animation
     setTimeout(() => {
-      onClose();
-    }, 200);
+      setInternalOpen(false); // hide modal
+      onClose(); // notify parent
+      // Reset form
+      setEmail('');
+      setPassword('');
+      setRememberMe(false);
+      setLocalError('');
+      setPersistentError('');
+    }, 200); // animation duration
   };
 
-  // Handle login form submission
+  // Handle login submission
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setLocalError('');
+    setPersistentError('');
 
-    // CLIENT-SIDE VALIDATION: Check both email and password are provided
+    // Client-side validation
     if (!email || !password) {
       setLocalError('Email and password are required');
       return;
     }
-
-    // CLIENT-SIDE VALIDATION: Basic email format check
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setLocalError('Please enter a valid email address');
       return;
     }
-
-    // CLIENT-SIDE VALIDATION: Check password is not too short
     if (password.length < 3) {
       setLocalError('Password must be at least 3 characters');
       return;
     }
 
-    // Validation passed - send login request to backend
-    // Backend will check if user exists and validate password
+    // Send login request
     login(
       { email, password },
       {
-        // Success callback: close modal on successful login
         onSuccess: () => {
-          // Close modal on successful login
-          handleClose();
+          handleClose(); // close modal only on success
+        },
+        onError: (err: any) => {
+          // keep modal open, show error
+          const msg =
+            err?.response?.data?.message || 'Login failed. Please check your credentials.';
+          setPersistentError(msg);
         },
       }
     );
   };
 
-  // Don't render anything if modal is not open
-  if (!isOpen) return null;
+  if (!internalOpen) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
       onClick={(e) => {
-        // Only close if clicking on the backdrop, not the modal itself
         if (e.target === e.currentTarget) {
-          // Don't close on backdrop click - only close button works
+          // optional: close on backdrop click
+          // handleClose();
         }
       }}
     >
-     
-      <div className={`bg-white rounded-lg w-full max-w-4xl max-h-[95vh] overflow-hidden flex flex-col md:flex-row transform transition-transform duration-300 ease-out ${
-        isVisible ? 'translate-x-0' : (isOpen ? '-translate-x-full' : 'translate-x-full')
-      }`}>
-        {/* Left Side - Blue Section - Hidden on mobile, visible on tablet+ */}
+      <div
+        className={`bg-white rounded-lg w-full max-w-4xl max-h-[95vh] overflow-hidden flex flex-col md:flex-row transform transition-transform duration-300 ease-out ${
+          isVisible ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        {/* LEFT SIDE */}
         <div className="hidden md:flex bg-blue-600 text-white p-6 md:p-8 md:flex-1 flex-col justify-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6">Login</h2>
           <p className="text-base md:text-lg opacity-90">
@@ -118,9 +112,9 @@ export const LoginModal = ({ isOpen, onClose, onSwitchToSignup }: LoginModalProp
           </p>
         </div>
 
-        {/* Right Side - Form Section - Full width on mobile */}
+        {/* RIGHT SIDE FORM */}
         <div className="flex-1 p-4 md:p-8 relative overflow-y-auto max-h-[95vh] md:max-h-none">
-          <button 
+          <button
             onClick={handleClose}
             className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded"
           >
@@ -128,7 +122,6 @@ export const LoginModal = ({ isOpen, onClose, onSwitchToSignup }: LoginModalProp
           </button>
 
           <div className="mt-4 md:mt-8">
-            {/* Mobile login icon - shown only on mobile */}
             <div className="md:hidden flex justify-center mb-4">
               <button
                 type="button"
@@ -138,24 +131,14 @@ export const LoginModal = ({ isOpen, onClose, onSwitchToSignup }: LoginModalProp
                 <LogIn className="h-6 w-6 text-blue-600" />
               </button>
             </div>
-            
-            {/* Mobile heading - shown only on mobile */}
+
             <h2 className="md:hidden text-2xl font-bold mb-4 text-gray-800 text-center">Login</h2>
-            
-            {/* Error Messages - Display with clear feedback */}
-            {(localError || error) && (
+
+            {/* ERROR MESSAGE */}
+            {(localError || persistentError) && (
               <div className="mb-4 p-3 md:p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm md:text-base">
                 <p className="font-semibold mb-1">Login Failed</p>
-                <p className="text-xs md:text-sm">
-                  {localError && localError}
-                  {!localError && error?.response?.data?.message === 'Invalid credentials' && 
-                    'User not found or incorrect password. Please check your email and password.'}
-                  {!localError && error?.response?.data?.message && 
-                    error.response.data.message !== 'Invalid credentials' &&
-                    error.response.data.message}
-                  {!localError && !error?.response?.data?.message && 
-                    'An error occurred. Please try again.'}
-                </p>
+                <p className="text-xs md:text-sm">{localError || persistentError}</p>
               </div>
             )}
 
@@ -207,7 +190,7 @@ export const LoginModal = ({ isOpen, onClose, onSwitchToSignup }: LoginModalProp
                 </a>
               </div>
 
-              <button 
+              <button
                 type="submit"
                 disabled={isPending}
                 className="w-full bg-blue-600 text-white py-2 md:py-3 rounded font-medium text-sm md:text-base hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
@@ -216,10 +199,8 @@ export const LoginModal = ({ isOpen, onClose, onSwitchToSignup }: LoginModalProp
               </button>
 
               <div className="mt-4 md:mt-6 text-center">
-                <p className="text-gray-600 mb-2 md:mb-3 text-sm md:text-base">
-                  New to our platform?
-                </p>
-                <button 
+                <p className="text-gray-600 mb-2 md:mb-3 text-sm md:text-base">New to our platform?</p>
+                <button
                   type="button"
                   onClick={() => {
                     handleClose();
