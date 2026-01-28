@@ -6,9 +6,10 @@ interface ProductShowcaseProps {
   products: Product[];
   categories: Category[];
   onAddToCart: (product: Product) => void;
+  onLoginRequired?: () => void;
 }
 
-export const ProductShowcase = ({ products, onAddToCart }: ProductShowcaseProps) => {
+export const ProductShowcase = ({ products, onAddToCart, onLoginRequired }: ProductShowcaseProps) => {
   const [selectedCategory, setSelectedCategory] = useState('Men\'s Fashion');
   const [bannerIndex, setBannerIndex] = useState(0);
   
@@ -130,6 +131,7 @@ export const ProductShowcase = ({ products, onAddToCart }: ProductShowcaseProps)
                     <ProductCard
                       product={product}
                       onAddToCart={onAddToCart}
+                      onLoginRequired={onLoginRequired}
                       isFeatured={product.isSale || product.isNew}
                     />
                   </div>

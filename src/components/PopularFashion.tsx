@@ -5,9 +5,10 @@ import { ProductCard } from './ProductCard';
 interface PopularFashionProps {
   products: Product[];
   onAddToCart: (product: Product) => void;
+  onLoginRequired?: () => void;
 }
 
-export const PopularFashion = ({ products, onAddToCart }: PopularFashionProps) => {
+export const PopularFashion = ({ products, onAddToCart, onLoginRequired }: PopularFashionProps) => {
   const [selectedCategory, setSelectedCategory] = useState('Women');
 
   const categories = [
@@ -68,6 +69,7 @@ export const PopularFashion = ({ products, onAddToCart }: PopularFashionProps) =
                   key={product.id}
                   product={product}
                   onAddToCart={onAddToCart}
+                  onLoginRequired={onLoginRequired}
                   isFeatured={product.isSale || product.isNew}
                 />
               ))}

@@ -1,19 +1,32 @@
 import { Star, ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import type { Product } from '../types';
 
 interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product) => void;
+  onLoginRequired?: () => void; // Called when user is not logged in
   isFeatured?: boolean;
 }
 
-export const ProductCard = ({ product, onAddToCart, isFeatured }: ProductCardProps) => {
+export const ProductCard = ({ product, onAddToCart, onLoginRequired, isFeatured }: ProductCardProps) => {
   const navigate = useNavigate();
+  // Get the logged-in status from auth context
+  const { isLoggedIn } = useAuth();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    // Check if user is logged in
+    if (!isLoggedIn) {
+      // If not logged in, trigger login modal instead of adding to cart
+      onLoginRequired?.();
+      return;
+    }
+    
     try {
+      // User is logged in, proceed with adding to cart
       onAddToCart(product);
     } catch (error) {
       console.error('Failed to add product to cart:', error);
@@ -89,10 +102,16 @@ export const ProductCard = ({ product, onAddToCart, isFeatured }: ProductCardPro
         
         <button
           onClick={handleAddToCart}
-          className="w-full bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center space-x-1"
+          disabled={false}
+          className={`w-full text-white px-3 py-2 rounded-md transition-colors flex items-center justify-center space-x-1 ${
+            !isLoggedIn
+              ? 'bg-gray-400 cursor-not-allowed hover:bg-gray-500' // Disabled look when not logged in
+              : 'bg-blue-600 hover:bg-blue-700' // Normal look when logged in
+          }`}
+          title={!isLoggedIn ? 'Please log in to add items to cart' : 'Add to cart'}
         >
           <ShoppingCart className="h-4 w-4" />
-          <span>Add</span>
+          <span>{!isLoggedIn ? 'Login to Add' : 'Add'}</span>
         </button>
       </div>
     </div>

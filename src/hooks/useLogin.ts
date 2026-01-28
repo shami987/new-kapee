@@ -45,6 +45,10 @@ export const useLogin = () => {
       // Store the user information in local storage
       // Can be used to display user name, email, etc. in the app
       localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Backend has already verified:
+      // 1. User exists with that email
+      // 2. Password is correct
     },
   });
 };

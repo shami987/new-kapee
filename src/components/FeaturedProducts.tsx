@@ -5,10 +5,11 @@ import { ProductCard } from './ProductCard';
 interface FeaturedProductsProps {
   products: Product[];
   onAddToCart: (product: Product) => void;
+  onLoginRequired?: () => void;
   onViewAll?: () => void;
 }
 
-export const FeaturedProducts = ({ products, onAddToCart, onViewAll }: FeaturedProductsProps) => {
+export const FeaturedProducts = ({ products, onAddToCart, onLoginRequired, onViewAll }: FeaturedProductsProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   
   // Filter products that are marked as featured (isSale or isNew)
@@ -68,6 +69,7 @@ export const FeaturedProducts = ({ products, onAddToCart, onViewAll }: FeaturedP
                   <ProductCard
                     product={product}
                     onAddToCart={onAddToCart}
+                    onLoginRequired={onLoginRequired}
                     isFeatured={true}
                   />
                 </div>

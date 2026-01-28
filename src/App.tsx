@@ -12,6 +12,7 @@ import { ProductCard } from './components/ProductCard';
 import { CartSidebar } from './components/CartSidebar';
 import { ProductFilters } from './components/ProductFilters';
 import { SignupModal } from './components/SignupModal';
+import { LoginModal } from './components/LoginModal';
 import { useCart } from './hooks/useCart';
 import { products, categories } from './data/products';
 
@@ -37,6 +38,8 @@ function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
+  // Add login modal state
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [filters, setFilters] = useState({
     category: '',
     priceRange: [0, 1000] as [number, number],
@@ -111,6 +114,7 @@ function App() {
         <FeaturedProducts 
           products={products} 
           onAddToCart={addToCart}
+          onLoginRequired={() => setIsLoginModalOpen(true)}
           onViewAll={() => {
             const productsSection = document.querySelector('[data-products-section]');
             if (productsSection) {
@@ -123,10 +127,19 @@ function App() {
           products={products} 
           categories={categories}
           onAddToCart={addToCart}
+          onLoginRequired={() => setIsLoginModalOpen(true)}
         />
-        <WomenShowcase products={products} onAddToCart={addToCart} />
+        <WomenShowcase 
+          products={products} 
+          onAddToCart={addToCart}
+          onLoginRequired={() => setIsLoginModalOpen(true)}
+        />
         
-        <PopularFashion products={products} onAddToCart={addToCart} />
+        <PopularFashion 
+          products={products} 
+          onAddToCart={addToCart}
+          onLoginRequired={() => setIsLoginModalOpen(true)}
+        />
         
         <FashionCategories categories={categories} />
         
@@ -152,6 +165,7 @@ function App() {
                     key={product.id}
                     product={product}
                     onAddToCart={addToCart}
+                    onLoginRequired={() => setIsLoginModalOpen(true)}
                   />
                 ))}
               </div>
@@ -207,9 +221,23 @@ function App() {
         totalPrice={getTotalPrice}
       />
 
+      {/* Login modal - opens when user tries to add to cart without logging in */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onSwitchToSignup={() => {
+          setIsLoginModalOpen(false);
+          setIsSignupModalOpen(true);
+        }}
+      />
+
       <SignupModal
         isOpen={isSignupModalOpen}
         onClose={() => setIsSignupModalOpen(false)}
+        onSwitchToLogin={() => {
+          setIsSignupModalOpen(false);
+          setIsLoginModalOpen(true);
+        }}
       />
     </div>
   );
