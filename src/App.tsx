@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Header } from './components/Header';
 import { StickyNav } from './components/StickyNav';
 import { HeroBanner } from './components/HeroBanner';
