@@ -81,4 +81,4 @@ export const PopularFashion = ({ products, onAddToCart, onLoginRequired }: Popul
   );
 };
 
-export default PopularFashion;
+//export default PopularFashion;
