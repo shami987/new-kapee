@@ -96,7 +96,15 @@ export const LoginModal = ({ isOpen, onClose, onSwitchToSignup }: LoginModalProp
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      onClick={(e) => {
+        // Only close if clicking on the backdrop, not the modal itself
+        if (e.target === e.currentTarget) {
+          // Don't close on backdrop click - only close button works
+        }
+      }}
+    >
       {/* Modal container - responsive width and height */}
       <div className={`bg-white rounded-lg w-full max-w-4xl max-h-[95vh] overflow-hidden flex flex-col md:flex-row transform transition-transform duration-300 ease-out ${
         isVisible ? 'translate-x-0' : (isOpen ? '-translate-x-full' : 'translate-x-full')

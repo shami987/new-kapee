@@ -55,15 +55,6 @@ function App() {
     getTotalItems
   } = useCart();
 
-  // Show signup modal after 10 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsSignupModalOpen(true);
-    }, 10000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   const filteredProducts = useMemo(() => {
     let filtered = products.filter(product => {
       const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
