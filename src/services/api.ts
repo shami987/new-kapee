@@ -1,4 +1,5 @@
 import axios from 'axios';
+import type { Order } from '../types';
 
 // Get the API base URL from environment variables or use default
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
@@ -71,4 +72,14 @@ export const authAPI = {
   // Reset password using token from email
   resetPassword: (data: { token: string; newPassword: string }) =>
     apiClient.post('/auth/reset-password', data),
+};
+
+// Orders API
+export const ordersAPI = {
+  // Create a new order (payload typed as `Order`)
+  createOrder: (order: Order) => apiClient.post<Order>('/orders', order),
+
+  // Optional helpers
+  getOrder: (id: string) => apiClient.get<Order>(`/orders/${id}`),
+  listOrders: () => apiClient.get<Order[]>('/orders'),
 };

@@ -4,7 +4,7 @@ import { useCart } from '../hooks/useCart';
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
-  const { cartItems, getTotalPrice, clearCart } = useCart();
+  const { cartItems, getTotalPrice, checkout } = useCart();
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -52,24 +52,21 @@ export const CheckoutPage = () => {
     }
     
     setErrors({});
-    setIsSubmitting(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      // Log order data
-      console.log('Order placed:', { 
-        ...formData, 
-        items: cartItems, 
-        total: getTotalPrice 
-      });
-      
-      // Clear the cart
-      clearCart();
-      
-      // Navigate to order complete page
-      setIsSubmitting(false);
-      navigate('/order-complete');
-    }, 1000);
+    (async () => {
+      setIsSubmitting(true);
+      try {
+        const customerName = `${formData.firstName} ${formData.lastName}`.trim();
+        const createdOrder = await checkout(customerName);
+
+        // Navigate to order complete page and pass created order via state
+        setIsSubmitting(false);
+        navigate('/order-complete', { state: { order: createdOrder } });
+      } catch (err) {
+        setIsSubmitting(false);
+        console.error('Checkout failed', err);
+        setErrors({ submit: 'Failed to place order. Please try again.' });
+      }
+    })();
   };
 
   const shippingCost = 5.00;

@@ -21,3 +21,11 @@ export interface Category {
   image: string;
   productCount: number;
 }
+
+export interface Order {
+  id: string;
+  customerName: string;
+  total: number;
+  status: 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled';
+  date: string;
+}

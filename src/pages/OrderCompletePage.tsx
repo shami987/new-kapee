@@ -1,8 +1,11 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
+import type { Order } from '../types';
 
 export const OrderCompletePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const order = (location.state as any)?.order as Order | undefined;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -37,12 +40,21 @@ export const OrderCompletePage = () => {
           </h1>
 
           {/* Message */}
-          <p className="text-xl text-gray-600 mb-2">
-            Your order has been placed successfully.
-          </p>
-          <p className="text-gray-600 mb-8">
-            We've sent a confirmation email with your order details and tracking information.
-          </p>
+          {order ? (
+            <>
+              <p className="text-xl text-gray-600 mb-2">
+                Your order {order.id} has been placed successfully.
+              </p>
+              <p className="text-gray-600 mb-8">
+                {order.customerName ? `Order for ${order.customerName}.` : ''} We've sent a confirmation email with your order details and tracking information.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-xl text-gray-600 mb-2">Your order has been placed successfully.</p>
+              <p className="text-gray-600 mb-8">We've sent a confirmation email with your order details and tracking information.</p>
+            </>
+          )}
 
           {/* Order Info */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8 text-left">

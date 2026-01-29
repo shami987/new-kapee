@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import type { CartItem, Product } from '../types';
+import type { CartItem, Product, Order } from '../types';
+import { ordersAPI } from '../services/api';
 
 export const useCart = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
@@ -55,6 +56,25 @@ export const useCart = () => {
     setCartItems([]);
   };
 
+  // Build a minimal Order payload from the current cart
+  const buildOrder = (customerName: string): Order => {
+    return {
+      id: `order_${Date.now()}`,
+      customerName,
+      total: Number(getTotalPrice.toFixed(2)),
+      status: 'Pending',
+      date: new Date().toISOString(),
+    };
+  };
+
+  // Submit checkout: creates an order via API and clears the cart on success
+  const checkout = async (customerName: string) => {
+    const orderPayload = buildOrder(customerName);
+    const response = await ordersAPI.createOrder(orderPayload);
+    clearCart();
+    return response.data as Order;
+  };
+
   return {
     cartItems,
     addToCart,
@@ -63,5 +83,8 @@ export const useCart = () => {
     getTotalPrice,
     getTotalItems,
     clearCart
+    ,
+    buildOrder,
+    checkout
   };
 };
