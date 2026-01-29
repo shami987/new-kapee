@@ -55,8 +55,16 @@ export const CheckoutPage = () => {
     (async () => {
       setIsSubmitting(true);
       try {
-        const customerName = `${formData.firstName} ${formData.lastName}`.trim();
-        const createdOrder = await checkout(customerName);
+        const shippingAddress = {
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+          line1: formData.address,
+          line2: formData.apartment || undefined,
+          city: formData.city,
+          postalCode: formData.zipCode,
+          country: formData.country,
+        };
+
+        const createdOrder = await checkout(shippingAddress);
 
         // Navigate to order complete page and pass created order via state
         setIsSubmitting(false);

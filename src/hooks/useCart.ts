@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import type { CartItem, Product, Order } from '../types';
+import type { CartItem, Product, Order, OrderItem } from '../types';
 import { ordersAPI } from '../services/api';
 
 export const useCart = () => {
@@ -56,20 +56,46 @@ export const useCart = () => {
     setCartItems([]);
   };
 
-  // Build a minimal Order payload from the current cart
-  const buildOrder = (customerName: string): Order => {
+  // Build an Order payload from the current cart
+  const buildOrder = (
+    shippingAddress?: Order['shippingAddress'],
+    paymentMethod?: string,
+    userId?: number
+  ): Order => {
+    const items: OrderItem[] = cartItems.map(item => ({
+      productId: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+    }));
+
+    const subtotal = Number(getTotalPrice.toFixed(2));
+    const shipping = 5.0;
+    const tax = 0;
+    const total = Number((subtotal + shipping + tax).toFixed(2));
+
     return {
       id: `order_${Date.now()}`,
-      customerName,
-      total: Number(getTotalPrice.toFixed(2)),
-      status: 'Pending',
-      date: new Date().toISOString(),
+      userId,
+      items,
+      subtotal,
+      shipping,
+      tax,
+      total,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      shippingAddress,
+      paymentMethod,
     };
   };
 
   // Submit checkout: creates an order via API and clears the cart on success
-  const checkout = async (customerName: string) => {
-    const orderPayload = buildOrder(customerName);
+  const checkout = async (
+    shippingAddress?: Order['shippingAddress'],
+    paymentMethod?: string,
+    userId?: number
+  ) => {
+    const orderPayload = buildOrder(shippingAddress, paymentMethod, userId);
     const response = await ordersAPI.createOrder(orderPayload);
     clearCart();
     return response.data as Order;

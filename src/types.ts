@@ -22,10 +22,30 @@ export interface Category {
   productCount: number;
 }
 
+export interface OrderItem {
+  productId: number;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
 export interface Order {
   id: string;
-  customerName: string;
+  userId?: number;
+  items: OrderItem[];
+  subtotal: number;
+  shipping: number;
+  tax?: number;
   total: number;
-  status: 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled';
-  date: string;
+  status: 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled';
+  createdAt: string;
+  shippingAddress?: {
+    name?: string;
+    line1: string;
+    line2?: string;
+    city: string;
+    postalCode: string;
+    country: string;
+  };
+  paymentMethod?: string;
 }

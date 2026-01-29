@@ -46,7 +46,7 @@ export const OrderCompletePage = () => {
                 Your order {order.id} has been placed successfully.
               </p>
               <p className="text-gray-600 mb-8">
-                {order.customerName ? `Order for ${order.customerName}.` : ''} We've sent a confirmation email with your order details and tracking information.
+                {order.shippingAddress?.name ? `Order for ${order.shippingAddress.name}. ` : ''}We've sent a confirmation email with your order details and tracking information.
               </p>
             </>
           ) : (
