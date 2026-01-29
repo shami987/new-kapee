@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import type { Order, Product } from '../../types';
 import { adminOrdersAPI, adminProductsAPI, adminCustomersAPI, adminStatsAPI } from '../services/adminApi';
 
 export const useAdminStats = () => {
@@ -28,7 +29,7 @@ export const useAdminStats = () => {
 };
 
 export const useAdminOrders = () => {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,7 +55,7 @@ export const useAdminOrders = () => {
 };
 
 export const useAdminProducts = () => {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

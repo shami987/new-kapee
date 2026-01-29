@@ -1,4 +1,4 @@
-import { Bell, User, Search } from 'lucide-react';
+import { Bell, Search } from 'lucide-react';
 
 export const AdminHeader = ({ title }: { title: string }) => {
   const user = localStorage.getItem('user');
