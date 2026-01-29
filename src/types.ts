@@ -49,3 +49,14 @@ export interface Order {
   };
   paymentMethod?: string;
 }
+
+export interface DashboardStats {
+  totalRevenue: number;
+  totalOrders: number;
+  targetProgress: number; // e.g., 66.6
+  revenueBySource: {
+    website: number;
+    ecommerce: number;
+    offline: number;
+  };
+}
