@@ -105,13 +105,13 @@ export const ProductCard = ({ product, onAddToCart, onLoginRequired, isFeatured 
           disabled={false}
           className={`w-full text-white px-3 py-2 rounded-md transition-colors flex items-center justify-center space-x-1 ${
             !isLoggedIn
-              ? 'bg-gray-400 cursor-not-allowed hover:bg-gray-500' // Disabled look when not logged in
-              : 'bg-blue-600 hover:bg-blue-700' // Normal look when logged in
+              ? 'bg-gray-400 cursor-not-allowed hover:bg-gray-500'
+              : 'bg-blue-600 hover:bg-blue-700'
           }`}
           title={!isLoggedIn ? 'Please log in to add items to cart' : 'Add to cart'}
         >
           <ShoppingCart className="h-4 w-4" />
-          <span>{!isLoggedIn ? 'Login to Add' : 'Add'}</span>
+          <span>Add to Cart</span>
         </button>
       </div>
     </div>

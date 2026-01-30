@@ -1,5 +1,4 @@
 import type { Product } from '../types';
-import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ProductCard } from './ProductCard';
@@ -15,7 +14,6 @@ export const FeaturedProducts = ({
   onLoginRequired?: () => void;
   onViewAll?: () => void;
 }) => {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   const { data: products = [], isLoading } = useQuery({
@@ -28,16 +26,6 @@ export const FeaturedProducts = ({
   // Use API products if available, otherwise fallback to local products
   const allProducts = products.length > 0 ? products : localProducts;
   const featuredProducts = Array.isArray(allProducts) ? allProducts.slice(0, 10) : [];
-
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = scrollContainerRef.current.clientWidth * 0.8;
-      scrollContainerRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
-      });
-    }
-  };
 
   return (
     <section className="py-16 bg-gray-50">
@@ -55,7 +43,6 @@ export const FeaturedProducts = ({
 
         <div className="relative flex items-center">
           <div
-            ref={scrollContainerRef}
             className="overflow-x-auto flex gap-6 scroll-smooth"
             style={{ scrollbarWidth: 'none' }}
           >

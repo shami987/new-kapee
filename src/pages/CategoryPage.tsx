@@ -1,11 +1,14 @@
 import { useParams } from 'react-router-dom';
 import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Header } from '../components/Header';
 import { StickyNav } from '../components/StickyNav';
 import { ProductCard } from '../components/ProductCard';
 import { CartSidebar } from '../components/CartSidebar';
 import { useCart } from '../hooks/useCart';
-import { products, categories } from '../data/products';
+import { getAllProducts } from '../services/productService';
+import { getCategories } from '../services/categoryService';
+import { products as localProducts, categories as localCategories } from '../data/products';
 
 export const CategoryPage = () => {
   const { categoryName } = useParams();
@@ -20,6 +23,21 @@ export const CategoryPage = () => {
     getTotalItems
   } = useCart();
 
+  // Fetch products and categories from backend
+  const { data: products = [], isLoading: productsLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: getAllProducts,
+  });
+
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery({
+    queryKey: ['categories'],
+    queryFn: getCategories,
+  });
+
+  // Use API data if available, otherwise fallback to local data
+  const allProducts = products.length > 0 ? products : localProducts;
+  const allCategories = categories.length > 0 ? categories : localCategories;
+
   // Convert URL parameter to actual category name
   const decodedCategoryName = categoryName
     ? categoryName
@@ -30,10 +48,45 @@ export const CategoryPage = () => {
 
   // Filter products by category
   const filteredProducts = useMemo(() => {
-    return products.filter(product => 
-      product.category.toLowerCase() === decodedCategoryName.toLowerCase()
+    if (!decodedCategoryName) return [];
+    
+    console.log('Decoded category name:', decodedCategoryName);
+    console.log('Available products:', allProducts.map(p => ({ name: p.name, category: p.category })));
+    
+    const filtered = allProducts.filter(product => {
+      const productCategory = typeof product.category === 'string' 
+        ? product.category.toLowerCase() 
+        : product.category?.name?.toLowerCase() || '';
+      
+      const searchCategory = decodedCategoryName.toLowerCase();
+      
+      // Check for exact match or partial match
+      const matches = productCategory.includes(searchCategory) || 
+                     searchCategory.includes(productCategory) ||
+                     productCategory === searchCategory;
+      
+      console.log(`Product: ${product.name}, Category: ${productCategory}, Search: ${searchCategory}, Matches: ${matches}`);
+      return matches;
+    });
+    
+    console.log('Filtered products:', filtered);
+    return filtered;
+  }, [decodedCategoryName, allProducts]);
+
+  if (productsLoading || categoriesLoading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Header
+          cartItemsCount={getTotalItems}
+          onCartClick={() => setIsCartOpen(true)}
+          onSearch={() => {}}
+        />
+        <div className="flex items-center justify-center h-64">
+          <p className="text-lg">Loading...</p>
+        </div>
+      </div>
     );
-  }, [decodedCategoryName]);
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -65,7 +118,7 @@ export const CategoryPage = () => {
                 <h3 className="text-lg font-bold text-blue-600 mb-6">PRODUCT CATEGORIES</h3>
                 
                 <nav className="space-y-3">
-                  {categories.map((cat) => (
+                  {allCategories.map((cat) => (
                     <a
                       key={cat.id}
                       href={`/category/${cat.name.toLowerCase().replace(/\s+/g, '-')}`}
@@ -96,7 +149,7 @@ export const CategoryPage = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredProducts.map((product) => (
                     <ProductCard
-                      key={product.id}
+                      key={product._id}
                       product={product}
                       onAddToCart={addToCart}
                       isFeatured={product.isSale || product.isNew}
