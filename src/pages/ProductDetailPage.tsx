@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Star, Heart, Share2, Truck, HelpCircle, Minus, Plus } from 'lucide-react';
@@ -8,7 +8,6 @@ import { CartSidebar } from '../components/CartSidebar';
 import { useCart } from '../hooks/useCart';
 import { getProductById } from '../services/productService';
 import { products as localProducts } from '../data/products';
-import type { Product } from '../types';
 
 
 
@@ -27,7 +26,7 @@ export const ProductDetailPage = () => {
     getTotalPrice
   } = useCart();
 
-  const { data: fetchedProduct, isLoading, isError } = useQuery({
+  const { data: fetchedProduct, isLoading } = useQuery({
     queryKey: ['product', id],
     queryFn: () => getProductById(id!),
     enabled: !!id,

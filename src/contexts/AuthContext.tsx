@@ -13,6 +13,7 @@ interface AuthContextType {
   user: User | null;        // Currently logged in user, or null if not logged in
   token: string | null;     // JWT token for authenticated requests
   isLoggedIn: boolean;      // Convenience flag: true if user is logged in
+  login: (token: string, user: User) => void; // Function to set login state
   logout: () => void;       // Function to logout user
 }
 
@@ -53,6 +54,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []); // Empty dependency array = run only once on mount
 
+  // Function to set login state after successful authentication
+  const login = (token: string, user: User) => {
+    setToken(token);
+    setUser(user);
+    localStorage.setItem('authToken', token);
+    localStorage.setItem('user', JSON.stringify(user));
+  };
+
   // Function to logout the user
   const logout = () => {
     // Clear user from state
@@ -72,6 +81,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         token,
         isLoggedIn: !!token,  // true if token exists, false otherwise
+        login,
         logout,
       }}
     >

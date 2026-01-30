@@ -118,7 +118,7 @@ export const CategoryPage = () => {
                 <h3 className="text-lg font-bold text-blue-600 mb-6">PRODUCT CATEGORIES</h3>
                 
                 <nav className="space-y-3">
-                  {allCategories.map((cat) => (
+                  {allCategories.map((cat: any) => (
                     <a
                       key={cat.id}
                       href={`/category/${cat.name.toLowerCase().replace(/\s+/g, '-')}`}

@@ -1,7 +1,8 @@
-import { ShoppingCart, User, Menu, ChevronDown, Search, Heart, Plus } from 'lucide-react';
+import { ShoppingCart, User, Menu, ChevronDown, Search, Heart, Plus, LogOut } from 'lucide-react';
 import { LoginModal } from './LoginModal';
 import { SignupModal } from './SignupModal';
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface HeaderProps {
   cartItemsCount: number;
@@ -10,8 +11,10 @@ interface HeaderProps {
 }
 
 export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) => {
+  const { user, isLoggedIn, logout } = useAuth();
   const [currency, setCurrency] = useState('$ Dollar (US)');
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('menu');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -139,16 +142,50 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
             </div>
 
             <div className="flex items-center space-x-6">
-              <button 
-                onClick={() => setIsLoginModalOpen(true)}
-                className="flex items-center space-x-2 bg-blue-700 px-4 py-2 rounded hover:bg-blue-800 transition-colors"
-              >
-                <User className="h-5 w-5" />
-                <div className="text-left">
-                  <div className="text-xs">HELLO,</div>
-                  <div className="text-sm font-semibold">SIGN IN</div>
+              {isLoggedIn ? (
+                <div className="relative">
+                  <button 
+                    onClick={() => setShowUserDropdown(!showUserDropdown)}
+                    className="flex items-center space-x-2 bg-blue-700 px-4 py-2 rounded hover:bg-blue-800 transition-colors"
+                  >
+                    <User className="h-5 w-5" />
+                    <div className="text-left">
+                      <div className="text-xs">HELLO,</div>
+                      <div className="text-sm font-semibold truncate max-w-32">{user?.email || user?.name || 'USER'}</div>
+                    </div>
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
+                  {showUserDropdown && (
+                    <div className="absolute top-full right-0 mt-2 bg-white text-gray-800 rounded shadow-lg z-50 min-w-48">
+                      <div className="px-4 py-3 border-b">
+                        <p className="font-semibold">{user?.name}</p>
+                        <p className="text-sm text-gray-600">{user?.email}</p>
+                      </div>
+                      <button 
+                        onClick={() => {
+                          logout();
+                          setShowUserDropdown(false);
+                        }}
+                        className="flex items-center space-x-2 w-full text-left px-4 py-3 hover:bg-gray-100"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span>Logout</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
-              </button>
+              ) : (
+                <button 
+                  onClick={() => setIsLoginModalOpen(true)}
+                  className="flex items-center space-x-2 bg-blue-700 px-4 py-2 rounded hover:bg-blue-800 transition-colors"
+                >
+                  <User className="h-5 w-5" />
+                  <div className="text-left">
+                    <div className="text-xs">HELLO,</div>
+                    <div className="text-sm font-semibold">SIGN IN</div>
+                  </div>
+                </button>
+              )}
               
               <div className="flex items-center space-x-1">
                 <Heart className="h-6 w-6" />
@@ -218,16 +255,37 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
           <div className="fixed left-0 top-0 h-full w-80 bg-white">
             {/* Login Section */}
             <div className="bg-blue-600 text-white p-4">
-              <button 
-                onClick={() => setIsLoginModalOpen(true)}
-                className="flex items-center justify-between w-full"
-              >
-                <div className="flex items-center space-x-2">
-                  <User className="h-5 w-5" />
-                  <span className="font-medium">Login/Signup</span>
+              {isLoggedIn ? (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <User className="h-5 w-5" />
+                    <div>
+                      <div className="font-medium">{user?.email}</div>
+                      <div className="text-xs opacity-75">{user?.name}</div>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      logout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="p-2 hover:bg-blue-700 rounded"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </button>
                 </div>
-                <ChevronDown className="h-4 w-4 rotate-90" />
-              </button>
+              ) : (
+                <button 
+                  onClick={() => setIsLoginModalOpen(true)}
+                  className="flex items-center justify-between w-full"
+                >
+                  <div className="flex items-center space-x-2">
+                    <User className="h-5 w-5" />
+                    <span className="font-medium">Login/Signup</span>
+                  </div>
+                  <ChevronDown className="h-4 w-4 rotate-90" />
+                </button>
+              )}
             </div>
             
             {/* Menu Tabs */}

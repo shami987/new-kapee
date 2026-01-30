@@ -6,8 +6,8 @@ interface CartSidebarProps {
   isOpen: boolean;
   onClose: () => void;
   cartItems: CartItem[];
-  onUpdateQuantity: (productId: number, quantity: number) => void;
-  onRemoveItem: (productId: number) => void;
+  onUpdateQuantity: (productId: string, quantity: number) => void;
+  onRemoveItem: (productId: string) => void;
   totalPrice: number;
 }
 
@@ -35,7 +35,10 @@ export const CartSidebar = ({
           <button onClick={onClose} className="p-1 hover:bg-blue-700 rounded">
             <X className="h-6 w-6" />
           </button>
-          <h2 className="text-xl font-bold flex-1 text-center">MY CART</h2>
+          <div className="flex-1 text-center">
+            <h2 className="text-xl font-bold">MY CART</h2>
+            <p className="text-xs opacity-75">({cartItems.length > 0 && typeof cartItems[0]._id === 'string' ? 'Backend' : 'Local'})</p>
+          </div>
           <div className="w-8"></div>
         </div>
         
@@ -45,7 +48,7 @@ export const CartSidebar = ({
             <p className="text-gray-500 text-center mt-8">Your cart is empty</p>
           ) : (
             cartItems.map((item) => (
-              <div key={item.id} className="border-b pb-6">
+              <div key={item._id} className="border-b pb-6">
                 <div className="flex gap-4">
                   <img
                     src={item.image}
@@ -59,7 +62,7 @@ export const CartSidebar = ({
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-semibold text-sm text-gray-900">{item.name}</h3>
                       <button
-                        onClick={() => onRemoveItem(item.id)}
+                        onClick={() => onRemoveItem(item._id)}
                         className="text-red-500 hover:text-red-700 p-1"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -71,7 +74,7 @@ export const CartSidebar = ({
                         onClick={() => {
                           const newQuantity = item.quantity - 1;
                           if (newQuantity >= 1) {
-                            onUpdateQuantity(item.id, newQuantity);
+                            onUpdateQuantity(item._id, newQuantity);
                           }
                         }}
                         className="p-1 hover:bg-gray-200 rounded"
@@ -80,7 +83,7 @@ export const CartSidebar = ({
                       </button>
                       <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
                       <button
-                        onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => onUpdateQuantity(item._id, item.quantity + 1)}
                         className="p-1 hover:bg-gray-200 rounded"
                       >
                         <Plus className="h-3 w-3" />

@@ -305,7 +305,7 @@ export const CheckoutPage = () => {
                   <p className="text-gray-500 text-sm">Your cart is empty</p>
                 ) : (
                   cartItems.map(item => (
-                    <div key={item.id} className="flex justify-between items-start">
+                    <div key={item._id} className="flex justify-between items-start">
                       <div className="flex gap-3 flex-1">
                         <img
                           src={item.image}

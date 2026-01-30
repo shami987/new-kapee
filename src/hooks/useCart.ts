@@ -1,33 +1,138 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '../contexts/AuthContext';
+import { cartAPI } from '../services/cartService';
 import type { CartItem, Product, Order, OrderItem } from '../types';
 import { ordersAPI } from '../services/api';
 
 export const useCart = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+  const { isLoggedIn, user, token } = useAuth();
+  const queryClient = useQueryClient();
+  
+  console.log('🔐 Auth status:', { isLoggedIn, hasUser: !!user, hasToken: !!token });
+  
+  // Local cart state for non-logged-in users
+  const [localCartItems, setLocalCartItems] = useState<CartItem[]>(() => {
     const saved = localStorage.getItem('cart');
     return saved ? JSON.parse(saved) : [];
   });
 
+  // Fetch cart from backend for logged-in users
+  const { data: backendCartItems = [] } = useQuery({
+    queryKey: ['cart'],
+    queryFn: async () => {
+      console.log('💾 Fetching cart from backend...');
+      try {
+        const res = await cartAPI.getCart();
+        console.log('💾 Backend cart response:', res.data);
+        return res.data as CartItem[];
+      } catch (error) {
+        console.error('❌ Failed to fetch cart from backend:', error);
+        return [] as CartItem[];
+      }
+    },
+    enabled: isLoggedIn,
+  });
+
+  // Use backend cart if logged in AND backend has data, otherwise local cart
+  const cartItems: CartItem[] = isLoggedIn && Array.isArray(backendCartItems) && backendCartItems.length > 0 ? backendCartItems : localCartItems;
+  
+  console.log('Cart status:', { 
+    isLoggedIn, 
+    backendItems: Array.isArray(backendCartItems) ? backendCartItems.length : 0, 
+    localItems: localCartItems.length,
+    usingBackend: isLoggedIn && Array.isArray(backendCartItems) && backendCartItems.length > 0
+  });
+
+  // Update local storage when local cart changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-  }, [cartItems]);
+    if (!isLoggedIn) {
+      localStorage.setItem('cart', JSON.stringify(localCartItems));
+    }
+  }, [localCartItems, isLoggedIn]);
+
+  // Mutations for backend cart operations
+  const addToCartMutation = useMutation({
+    mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) => {
+      console.log('🚀 Making API call to add to cart:', { productId, quantity });
+      return cartAPI.addToCart(productId, quantity);
+    },
+    onSuccess: (data) => {
+      console.log('✅ Cart API success:', data);
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
+    },
+    onError: (error: any) => {
+      console.error('❌ Cart API error - falling back to local storage:', error);
+      // Remove the problematic fallback code
+    },
+  });
+
+  const updateCartMutation = useMutation({
+    mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) => 
+      cartAPI.updateCartItem(productId, quantity),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
+    },
+  });
+
+  const removeFromCartMutation = useMutation({
+    mutationFn: (productId: string) => cartAPI.removeFromCart(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
+    },
+  });
 
   const addToCart = (product: Product, quantity: number = 1) => {
-    setCartItems(prev => {
-      const existing = prev.find(item => item._id === product._id);
-      if (existing) {
-        return prev.map(item =>
-          item._id === product._id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      }
-      return [...prev, { ...product, quantity }];
-    });
+    console.log('Adding to cart:', { product: product.name, quantity, isLoggedIn });
+    
+    if (isLoggedIn) {
+      // Try backend cart API first
+      console.log('Using backend cart API');
+      addToCartMutation.mutate(
+        { productId: product._id, quantity },
+        {
+          onError: () => {
+            // If backend fails, fallback to local storage
+            console.log('Backend failed, using local storage fallback');
+            setLocalCartItems(prev => {
+              const existing = prev.find(item => item._id === product._id);
+              if (existing) {
+                return prev.map(item =>
+                  item._id === product._id
+                    ? { ...item, quantity: item.quantity + quantity }
+                    : item
+                );
+              }
+              return [...prev, { ...product, quantity }];
+            });
+          }
+        }
+      );
+    } else {
+      // Add to local cart
+      console.log('Using local cart storage');
+      setLocalCartItems(prev => {
+        const existing = prev.find(item => item._id === product._id);
+        if (existing) {
+          return prev.map(item =>
+            item._id === product._id
+              ? { ...item, quantity: item.quantity + quantity }
+              : item
+          );
+        }
+        return [...prev, { ...product, quantity }];
+      });
+    }
   };
 
   const removeFromCart = (productId: string) => {
-    setCartItems(prev => prev.filter(item => item._id !== productId));
+    if (isLoggedIn) {
+      // Remove from backend cart
+      removeFromCartMutation.mutate(productId);
+    } else {
+      // Remove from local cart
+      setLocalCartItems(prev => prev.filter(item => item._id !== productId));
+    }
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
@@ -35,25 +140,38 @@ export const useCart = () => {
       removeFromCart(productId);
       return;
     }
-    setCartItems(prev =>
-      prev.map(item =>
-        item._id === productId ? { ...item, quantity } : item
-      )
-    );
+    
+    if (isLoggedIn) {
+      // Update backend cart
+      updateCartMutation.mutate({ productId, quantity });
+    } else {
+      // Update local cart
+      setLocalCartItems(prev =>
+        prev.map(item =>
+          item._id === productId ? { ...item, quantity } : item
+        )
+      );
+    }
   };
 
   const getTotalPrice = useMemo(
-    () => cartItems.reduce((total, item) => total + item.price * item.quantity, 0),
+    () => cartItems.reduce((total: number, item: CartItem) => total + item.price * item.quantity, 0),
     [cartItems]
   );
 
   const getTotalItems = useMemo(
-    () => cartItems.reduce((total, item) => total + item.quantity, 0),
+    () => cartItems.reduce((total: number, item: CartItem) => total + item.quantity, 0),
     [cartItems]
   );
 
   const clearCart = () => {
-    setCartItems([]);
+    if (isLoggedIn) {
+      cartAPI.clearCart().then(() => {
+        queryClient.invalidateQueries({ queryKey: ['cart'] });
+      });
+    } else {
+      setLocalCartItems([]);
+    }
   };
 
   // Build an Order payload from the current cart
@@ -62,7 +180,7 @@ export const useCart = () => {
     paymentMethod?: string,
     userId?: number
   ): Order => {
-    const items: OrderItem[] = cartItems.map(item => ({
+    const items: OrderItem[] = cartItems.map((item: CartItem) => ({
       productId: item._id,
       name: item.name,
       price: item.price,

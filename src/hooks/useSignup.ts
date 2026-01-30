@@ -1,4 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
+import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/api';
 import { AxiosError } from 'axios';
 
@@ -28,6 +29,8 @@ interface ErrorResponse {
 // Custom hook for handling user signup
 // Returns functions and states to manage the signup process
 export const useSignup = () => {
+  const { login } = useAuth();
+  
   return useMutation<
     SignupResponse,        // Type of successful response
     AxiosError<ErrorResponse>,  // Type of error response
@@ -39,13 +42,8 @@ export const useSignup = () => {
     },
     // What to do after successful signup
     onSuccess: (data) => {
-      // Store the JWT token in browser's local storage
-      // This token will be used for future authenticated requests
-      localStorage.setItem('authToken', data.token);
-      
-      // Store the user information in local storage
-      // Can be used to display user name, email, etc. in the app
-      localStorage.setItem('user', JSON.stringify(data.user));
+      // Use AuthContext to set login state
+      login(data.token, data.user);
     },
   });
 };
