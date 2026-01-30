@@ -34,7 +34,7 @@ export const ProductCard = ({ product, onAddToCart, onLoginRequired, isFeatured 
   };
 
   const handleProductClick = () => {
-    navigate(`/product/${product.id}`);
+    navigate(`/product/${product._id}`);
   };
 
   return (
@@ -71,7 +71,7 @@ export const ProductCard = ({ product, onAddToCart, onLoginRequired, isFeatured 
       
       <div className="p-4 flex flex-col flex-grow">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.name}</h3>
-        <p className="text-sm text-gray-600 mb-2">{product.category}</p>
+        <p className="text-sm text-gray-600 mb-2">{typeof product.category === 'object' ? product.category?.name || 'Category' : product.category}</p>
         
         <div className="flex items-center mb-3">
           <div className="flex items-center">

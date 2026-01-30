@@ -101,7 +101,7 @@ function App() {
       
       <main>
         <HeroBanner />
-        <CategoryGrid categories={categories} />
+        <CategoryGrid  />
         <FeaturedProducts 
           products={products} 
           onAddToCart={addToCart}

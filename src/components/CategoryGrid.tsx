@@ -1,16 +1,22 @@
 import type { Category } from '../types';
-import { useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getCategories } from '../services/categoryService';
 
-interface CategoryGridProps {
-  categories: Category[];
-}
-
-export const CategoryGrid = ({ categories }: CategoryGridProps) => {
+export const CategoryGrid = () => {
   const navigate = useNavigate();
-  const duplicatedCategories = categories;
-  
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // 🔹 Categories from backend
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    getCategories()
+      .then(setCategories)
+      .catch(console.error);
+  }, []);
+
+  const duplicatedCategories = categories;
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -25,9 +31,10 @@ export const CategoryGrid = ({ categories }: CategoryGridProps) => {
   return (
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Carousel with navigation buttons */}
         <div className="relative flex items-center gap-4">
+
           {/* Previous Button */}
           <button
             onClick={() => scroll('left')}
@@ -51,12 +58,17 @@ export const CategoryGrid = ({ categories }: CategoryGridProps) => {
             <style>{`
               ::-webkit-scrollbar { display: none; }
             `}</style>
+
             <div className="flex gap-8 min-w-min px-4">
-              {duplicatedCategories.map((category, idx) => (
+              {duplicatedCategories.map((category, index) => (
                 <button
-                  key={`${category.id}-${idx}`}
+                  key={`${category.id}-${index}`}
                   className="flex flex-col items-center cursor-pointer group transition-all hover:scale-110 flex-shrink-0"
-                  onClick={() => navigate(`/category/${category.name.toLowerCase().replace(/\s+/g, '-')}`)}
+                  onClick={() =>
+                    navigate(
+                      `/category/${category.name.toLowerCase().replace(/\s+/g, '-')}`
+                    )
+                  }
                 >
                   <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-3 border-gray-300 group-hover:border-blue-500 shadow-lg group-hover:shadow-xl bg-white">
                     <img
@@ -65,7 +77,9 @@ export const CategoryGrid = ({ categories }: CategoryGridProps) => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <h3 className="mt-3 font-semibold text-gray-900 text-center text-xs md:text-sm">{category.name}</h3>
+                  <h3 className="mt-3 font-semibold text-gray-900 text-center text-xs md:text-sm">
+                    {category.name}
+                  </h3>
                 </button>
               ))}
             </div>
@@ -81,6 +95,7 @@ export const CategoryGrid = ({ categories }: CategoryGridProps) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
+
         </div>
       </div>
     </section>

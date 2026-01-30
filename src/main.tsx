@@ -10,6 +10,8 @@ import { CheckoutPage } from './pages/CheckoutPage.tsx'
 import { OrderCompletePage } from './pages/OrderCompletePage.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx'
 import { AdminDashboard, OrdersPage, ProductsPage, CustomersPage } from './admin'
+import { AdminAddProduct } from './pages/admin/AdminAddProduct.tsx'
+
 
 // Create React Query client
 // This manages all server state and caching
@@ -45,6 +47,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/orders" element={<OrdersPage />} />
             <Route path="/admin/products" element={<ProductsPage />} />
+            <Route path="/admin/products/add" element={<AdminAddProduct />} />
             <Route path="/admin/customers" element={<CustomersPage />} />
             
             {/* Fallback empty route */}

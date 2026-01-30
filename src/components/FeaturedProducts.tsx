@@ -1,28 +1,37 @@
 import type { Product } from '../types';
 import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { ProductCard } from './ProductCard';
-
-interface FeaturedProductsProps {
-  products: Product[];
-  onAddToCart: (product: Product) => void;
-  onLoginRequired?: () => void;
-  onViewAll?: () => void;
-}
+import { products as localProducts } from '../data/products';
+import { getAllProducts } from '../services/productService';
 
 export const FeaturedProducts = ({
-  products,
   onAddToCart,
   onLoginRequired,
   onViewAll,
-}: FeaturedProductsProps) => {
+}: {
+  onAddToCart: (product: Product) => void;
+  onLoginRequired?: () => void;
+  onViewAll?: () => void;
+}) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
-  // Filter featured products
-  const featuredProducts = products.filter((p) => p.isSale || p.isNew).slice(0, 10);
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: getAllProducts,
+  });
+
+  if (isLoading) return <p>Loading products...</p>;
+
+  // Use API products if available, otherwise fallback to local products
+  const allProducts = products.length > 0 ? products : localProducts;
+  const featuredProducts = Array.isArray(allProducts) ? allProducts.slice(0, 10) : [];
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
-      const scrollAmount = scrollContainerRef.current.clientWidth * 0.8; // scroll 80% of container width
+      const scrollAmount = scrollContainerRef.current.clientWidth * 0.8;
       scrollContainerRef.current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth',
@@ -33,77 +42,38 @@ export const FeaturedProducts = ({
   return (
     <section className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 sm:mb-12 gap-4">
-          <h2 className="text-2xl sm:text-3xl font-bold">FEATURED PRODUCTS</h2>
+
+        <div className="flex justify-between mb-8">
+          <h2 className="text-3xl font-bold">FEATURED PRODUCTS</h2>
           <button
             onClick={onViewAll}
-            className="bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded hover:bg-blue-700 transition-colors font-semibold text-sm sm:text-base"
+            className="bg-blue-600 text-white px-6 py-2 rounded"
           >
             VIEW ALL
           </button>
         </div>
 
-        {/* Carousel */}
         <div className="relative flex items-center">
-          {/* Prev Button */}
-          <button
-            onClick={() => scroll('left')}
-            className="absolute left-0 z-10 bg-white border border-gray-300 rounded-full p-2 sm:p-3 hover:bg-gray-100 hover:border-blue-500 transition-all shadow-md"
-            aria-label="Previous"
-          >
-            <svg
-              className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600 hover:text-blue-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-
-          {/* Scrollable Container */}
           <div
             ref={scrollContainerRef}
-            className="overflow-x-auto scroll-smooth flex gap-4 sm:gap-6 py-2"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="overflow-x-auto flex gap-6 scroll-smooth"
+            style={{ scrollbarWidth: 'none' }}
           >
-            <style>{`
-              ::-webkit-scrollbar { display: none; }
-            `}</style>
-
-            <div className="flex gap-4 sm:gap-6">
-              {featuredProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="flex-shrink-0 w-64 sm:w-72 md:w-80 lg:w-72 xl:w-80"
-                >
-                  <ProductCard
-                    product={product}
-                    onAddToCart={onAddToCart}
-                    onLoginRequired={onLoginRequired}
-                    isFeatured={true}
-                  />
-                </div>
-              ))}
-            </div>
+            {featuredProducts.map((product) => (
+              <div
+                key={product._id}
+                className="w-72 flex-shrink-0"
+                onClick={() => navigate(`/product/${product._id}`)}
+              >
+                <ProductCard
+                  product={product}
+                  onAddToCart={onAddToCart}
+                  onLoginRequired={onLoginRequired}
+                  isFeatured
+                />
+              </div>
+            ))}
           </div>
-
-          {/* Next Button */}
-          <button
-            onClick={() => scroll('right')}
-            className="absolute right-0 z-10 bg-white border border-gray-300 rounded-full p-2 sm:p-3 hover:bg-gray-100 hover:border-blue-500 transition-all shadow-md"
-            aria-label="Next"
-          >
-            <svg
-              className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600 hover:text-blue-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
         </div>
       </div>
     </section>
