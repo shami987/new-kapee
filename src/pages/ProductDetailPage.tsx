@@ -6,8 +6,9 @@ import { Star, Heart, Share2, Truck, HelpCircle, Minus, Plus } from 'lucide-reac
 import { Header } from '../components/Header';
 import { CartSidebar } from '../components/CartSidebar';
 import { useCart } from '../hooks/useCart';
+import { getProductById } from '../services/productService';
+import { products as localProducts } from '../data/products';
 import type { Product } from '../types';
-import axios from 'axios';
 
 
 
@@ -26,15 +27,19 @@ export const ProductDetailPage = () => {
     getTotalPrice
   } = useCart();
 
-  /* 🔹 React Query */
-  const { data: product, isLoading, isError } = useQuery({
+  const { data: fetchedProduct, isLoading, isError } = useQuery({
     queryKey: ['product', id],
     queryFn: () => getProductById(id!),
     enabled: !!id,
   });
 
+  // Fallback to local products if API fails
+  const product = fetchedProduct || localProducts.find(p => p._id === id);
+
+  console.log('Product data:', product); // Debug log
+
   if (isLoading) return <div className="p-10">Loading product...</div>;
-  if (isError || !product) return <div className="p-10">Product not found</div>;
+  if (!product) return <div className="p-10">Product not found</div>;
 
   const images = [
     product.image,
@@ -90,26 +95,41 @@ export const ProductDetailPage = () => {
           {/* Details */}
           <div className="space-y-6">
             <h1 className="text-3xl font-bold">{product.name}</h1>
+            
+            {product.category && (
+              <p className="text-blue-600 font-medium">
+                Category: {typeof product.category === 'object' ? product.category.name : product.category}
+              </p>
+            )}
+            
+            {product.description && (
+              <p className="text-gray-600 text-lg">{product.description}</p>
+            )}
 
             <div className="flex items-center space-x-2">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star
                   key={i}
                   className={`h-5 w-5 ${
-                    i < Math.round(product.rating)
+                    i < Math.round(product.rating || 0)
                       ? 'text-yellow-400 fill-current'
                       : 'text-gray-300'
                   }`}
                 />
               ))}
-              <span className="text-gray-600">({product.reviews} reviews)</span>
+              <span className="text-gray-600">({product.reviews || 0} reviews)</span>
             </div>
 
             <div className="flex items-center space-x-4">
-              <span className="text-4xl font-bold">${product.price}</span>
+              <span className="text-4xl font-bold">${product.price || 0}</span>
               {product.originalPrice && (
                 <span className="line-through text-gray-500 text-xl">
                   ${product.originalPrice}
+                </span>
+              )}
+              {product.isSale && (
+                <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm">
+                  Sale
                 </span>
               )}
             </div>

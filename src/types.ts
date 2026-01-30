@@ -1,6 +1,7 @@
 export interface Product {
   _id: string;
   name: string;
+  description?: string;
   price: number;
   originalPrice?: number;
   image: string;
@@ -23,7 +24,7 @@ export interface Category {
 }
 
 export interface OrderItem {
-  productId: number;
+  productId: string;
   name: string;
   price: number;
   quantity: number;

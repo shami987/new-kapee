@@ -1,19 +1,58 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { X, Star, Heart, Share2, Truck, HelpCircle, Minus, Plus } from 'lucide-react';
+import { getProductById } from '../services/productService';
 import type { Product } from '../types';
 
 interface ProductDetailProps {
-  product: Product;
+  productId?: string;
+  product?: Product;
   isOpen: boolean;
   onClose: () => void;
   onAddToCart: (product: Product, quantity: number) => void;
 }
 
-export const ProductDetail = ({ product, isOpen, onClose, onAddToCart }: ProductDetailProps) => {
+export const ProductDetail = ({ productId, product: propProduct, isOpen, onClose, onAddToCart }: ProductDetailProps) => {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
 
+  // Fetch product data if productId is provided
+  const { data: fetchedProduct, isLoading } = useQuery({
+    queryKey: ['product', productId],
+    queryFn: () => getProductById(productId!),
+    enabled: !!productId && isOpen,
+  });
+
+  // Use fetched product or prop product
+  const product = fetchedProduct || propProduct;
+
+  useEffect(() => {
+    setSelectedImage(0);
+    setQuantity(1);
+  }, [product]);
+
   if (!isOpen) return null;
+  
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg p-8">
+          <div className="text-center">Loading product...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg p-8">
+          <div className="text-center">Product not found</div>
+          <button onClick={onClose} className="mt-4 px-4 py-2 bg-gray-500 text-white rounded">Close</button>
+        </div>
+      </div>
+    );
+  }
 
   const images = [product.image, product.image, product.image];
 

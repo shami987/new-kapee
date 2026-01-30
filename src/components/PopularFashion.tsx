@@ -66,7 +66,7 @@ export const PopularFashion = ({ products, onAddToCart, onLoginRequired }: Popul
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {displayProducts.map((product) => (
                 <ProductCard
-                  key={product.id}
+                  key={product._id}
                   product={product}
                   onAddToCart={onAddToCart}
                   onLoginRequired={onLoginRequired}

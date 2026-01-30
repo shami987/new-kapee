@@ -7,5 +7,5 @@ export const getAllProducts = async (): Promise<any[]> => {
 
 export const getProductById = async (id: string) => {
   const res = await apiClient.get(`/products/${id}`);
-  return res.data;
+  return res.data.product || res.data; // Handle both response formats
 };

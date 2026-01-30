@@ -2,7 +2,7 @@ import type { Product, Category } from '../types';
 
 export const products: Product[] = [
   {
-    id: 1,
+    _id: "1",
     name: "Men's Casual Blazer",
     price: 89.99,
     originalPrice: 129.99,
@@ -13,7 +13,7 @@ export const products: Product[] = [
     isSale: true
   },
   {
-    id: 2,
+    _id: "2",
     name: "White Leather Sneakers",
     price: 79.99,
     image: "https://kapee.presslayouts.com/wp-content/uploads/2019/04/Men-Blue-Colourblocked-Mid-Top-Sneakers.jpg",
@@ -23,7 +23,7 @@ export const products: Product[] = [
     isNew: true
   },
   {
-    id: 3,
+    _id: "3",
     name: "Women's Handbag",
     price: 124.99,
     originalPrice: 189.99,
@@ -34,7 +34,7 @@ export const products: Product[] = [
     isSale: true
   },
   {
-    id: 4,
+    _id: "4",
     name: "Striped Cotton T-Shirt",
     price: 29.99,
     originalPrice: 39.99,
@@ -45,7 +45,7 @@ export const products: Product[] = [
     isSale: true
   },
   {
-    id: 5,
+    _id: "5",
     name: "Women Khaki Solid Top",
     price: 159.99,
     image: "https://kapee.presslayouts.com/wp-content/uploads/2019/04/Women-Khaki-Solid-Top.jpg",
@@ -54,7 +54,7 @@ export const products: Product[] = [
     reviews: 143
   },
   {
-    id: 6,
+    _id: "6",
     name: "Women's Running Shoes",
     price: 99.99,
     image: "https://kapee.presslayouts.com/wp-content/uploads/2019/04/Men-Blue-Skinny-Fit-Stretchable-Jeans.jpg",
@@ -63,7 +63,7 @@ export const products: Product[] = [
     reviews: 92
   },
   {
-    id: 7,
+    _id: "7",
     name: "Denim Jacket",
     price: 69.99,
     originalPrice: 89.99,
@@ -74,7 +74,7 @@ export const products: Product[] = [
     isSale: true
   },
   {
-    id: 8,
+    _id: "8",
     name: "Leather Wallet",
     price: 39.99,
     image: "https://kapee.presslayouts.com/wp-content/uploads/2019/04/Men-Navy-Red-Checked-Slim-Fit-Casual-Shirt-2-430x502.jpg",
