@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Trash2, Edit, Plus } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
 interface CartItem {
   _id: string;
@@ -19,8 +19,6 @@ interface UserCart {
 
 export const AdminCartManagement = () => {
   const [userCarts, setUserCarts] = useState<UserCart[]>([]);
-  const [selectedUserId, setSelectedUserId] = useState<string>('');
-  const [loading, setLoading] = useState(false);
 
   // Mock data - replace with actual API calls
   useEffect(() => {

@@ -2,3 +2,8 @@ export { AdminLayout } from './AdminLayout';
 export { AdminSidebar } from './AdminSidebar';
 export { AdminHeader } from './AdminHeader';
 export { StatCard } from './StatCard';
+export { RevenueChart } from './RevenueChart';
+export { TopProducts } from './TopProducts';
+export { RecentOrders } from './RecentOrders';
+export { AnalyticsOverview } from './AnalyticsOverview';
+export { QuickActions } from './QuickActions';

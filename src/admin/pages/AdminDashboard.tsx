@@ -1,95 +1,99 @@
-import { AdminLayout, StatCard } from '../components';
+import { useState, useEffect } from 'react';
+import { AdminLayout, StatCard, RevenueChart, TopProducts, RecentOrders, AnalyticsOverview, QuickActions } from '../components';
 import { TrendingUp, Users, ShoppingCart, DollarSign } from 'lucide-react';
+import { useAdminStats, useAdminOrders } from '../hooks/useAdminData';
 
 export const AdminDashboard = () => {
-  // Mock data - replace with real API calls
-  const stats = [
+  const { stats, loading: statsLoading } = useAdminStats();
+  const { orders, loading: ordersLoading } = useAdminOrders();
+  
+  // Mock data for charts - replace with real API data
+  const revenueData = [
+    { month: 'Jan', revenue: 35000, orders: 120 },
+    { month: 'Feb', revenue: 42000, orders: 145 },
+    { month: 'Mar', revenue: 38000, orders: 132 },
+    { month: 'Apr', revenue: 45231, orders: 156 },
+    { month: 'May', revenue: 52000, orders: 178 },
+    { month: 'Jun', revenue: 48000, orders: 165 }
+  ];
+
+  const topProducts = [
+    { name: 'Wireless Earbuds', sales: 234, revenue: 4560 },
+    { name: 'Phone Case Pro', sales: 189, revenue: 2835 },
+    { name: 'USB-C Hub', sales: 156, revenue: 1872 },
+    { name: 'Smart Watch', sales: 143, revenue: 2145 },
+    { name: 'Bluetooth Speaker', sales: 128, revenue: 1920 }
+  ];
+
+  const recentOrders = [
+    { id: '#12345', customer: 'John Doe', amount: 250.00, status: 'Delivered' as const, date: '2024-01-15', items: 3 },
+    { id: '#12344', customer: 'Jane Smith', amount: 180.50, status: 'Pending' as const, date: '2024-01-14', items: 2 },
+    { id: '#12343', customer: 'Bob Johnson', amount: 420.00, status: 'Processing' as const, date: '2024-01-13', items: 5 },
+    { id: '#12342', customer: 'Alice Brown', amount: 95.75, status: 'Delivered' as const, date: '2024-01-12', items: 1 },
+    { id: '#12341', customer: 'Charlie Wilson', amount: 315.25, status: 'Cancelled' as const, date: '2024-01-11', items: 4 }
+  ];
+
+  const analyticsData = {
+    conversionRate: 3.2,
+    avgOrderValue: 187.50,
+    customerRetention: 68.5,
+    categoryBreakdown: [
+      { name: 'Electronics', value: 45, color: '#3B82F6' },
+      { name: 'Fashion', value: 30, color: '#10B981' },
+      { name: 'Home & Garden', value: 15, color: '#F59E0B' },
+      { name: 'Sports', value: 10, color: '#EF4444' }
+    ]
+  };
+
+  const defaultStats = [
     { title: 'Total Revenue', value: '$45,231.89', change: '+20.1%', icon: <DollarSign className="text-green-600" />, color: 'green' as const },
     { title: 'Total Orders', value: '1,234', change: '+12.5%', icon: <ShoppingCart className="text-blue-600" />, color: 'blue' as const },
     { title: 'Total Customers', value: '5,678', change: '+8.2%', icon: <Users className="text-orange-600" />, color: 'orange' as const },
     { title: 'Growth Rate', value: '23.5%', change: '+4.3%', icon: <TrendingUp className="text-red-600" />, color: 'red' as const },
   ];
 
+  const handleViewOrder = (orderId: string) => {
+    console.log('View order:', orderId);
+    // Navigate to order details page
+  };
+
+  if (statsLoading || ordersLoading) {
+    return (
+      <AdminLayout title="Dashboard">
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </AdminLayout>
+    );
+  }
+
   return (
     <AdminLayout title="Dashboard">
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat, index) => (
+        {defaultStats.map((stat, index) => (
           <StatCard key={index} {...stat} />
         ))}
       </div>
 
+      {/* Quick Actions */}
+      <div className="mb-8">
+        <QuickActions />
+      </div>
+
+      {/* Analytics Overview */}
+      <div className="mb-8">
+        <AnalyticsOverview data={analyticsData} />
+      </div>
+
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Revenue Chart */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Revenue Overview</h3>
-          <div className="h-64 bg-gray-100 rounded flex items-center justify-center text-gray-500">
-            Chart will be rendered here (Chart.js/Recharts)
-          </div>
-        </div>
-
-        {/* Top Products */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Top Products</h3>
-          <div className="space-y-3">
-            {[
-              { name: 'Wireless Earbuds', sales: 234, revenue: '$4,560' },
-              { name: 'Phone Case Pro', sales: 189, revenue: '$2,835' },
-              { name: 'USB-C Hub', sales: 156, revenue: '$1,872' },
-            ].map((product, index) => (
-              <div key={index} className="flex justify-between items-center pb-3 border-b last:border-0">
-                <div>
-                  <p className="font-medium text-gray-900">{product.name}</p>
-                  <p className="text-sm text-gray-500">{product.sales} sales</p>
-                </div>
-                <p className="font-bold text-gray-900">{product.revenue}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <RevenueChart data={revenueData} />
+        <TopProducts products={topProducts} />
       </div>
 
       {/* Recent Orders */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Orders</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-medium text-gray-600">Order ID</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-600">Customer</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-600">Amount</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-600">Status</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-600">Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                { id: '#12345', customer: 'John Doe', amount: '$250.00', status: 'Delivered', date: '2024-01-15' },
-                { id: '#12344', customer: 'Jane Smith', amount: '$180.50', status: 'Pending', date: '2024-01-14' },
-                { id: '#12343', customer: 'Bob Johnson', amount: '$420.00', status: 'Processing', date: '2024-01-13' },
-              ].map((order, index) => (
-                <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="py-3 px-4 text-gray-900 font-medium">{order.id}</td>
-                  <td className="py-3 px-4 text-gray-900">{order.customer}</td>
-                  <td className="py-3 px-4 text-gray-900 font-bold">{order.amount}</td>
-                  <td className="py-3 px-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      order.status === 'Delivered' ? 'bg-green-100 text-green-800' :
-                      order.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-blue-100 text-blue-800'
-                    }`}>
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-gray-600">{order.date}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <RecentOrders orders={recentOrders} onViewOrder={handleViewOrder} />
     </AdminLayout>
   );
 };

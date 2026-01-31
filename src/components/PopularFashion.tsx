@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import type { Product } from '../types';
 import { ProductCard } from './ProductCard';
+import { useQuery } from '@tanstack/react-query';
+import { getAllProducts } from '../services/productService';
 
 interface PopularFashionProps {
-  products: Product[];
   onAddToCart: (product: Product) => void;
   onLoginRequired?: () => void;
 }
 
-export const PopularFashion = ({ products, onAddToCart, onLoginRequired }: PopularFashionProps) => {
+export const PopularFashion = ({ onAddToCart, onLoginRequired }: PopularFashionProps) => {
   const [selectedCategory, setSelectedCategory] = useState('Women');
 
   const categories = [
@@ -22,8 +23,32 @@ export const PopularFashion = ({ products, onAddToCart, onLoginRequired }: Popul
     'Bags & Backpacks'
   ];
 
+  // 🔥 Fetch products from backend
+  const { data: products = [], isLoading, error } = useQuery({
+    queryKey: ['products'],
+    queryFn: getAllProducts,
+  });
 
-  const displayProducts = products.slice(0, 8);
+  if (isLoading) return <p className="text-center py-12">Loading products...</p>;
+  if (error) return <p className="text-center py-12 text-red-500">Failed to load products</p>;
+
+  // 🔎 Filter by selected category
+  const filteredProducts = products.filter((product) => {
+    if (selectedCategory === 'Others') return true;
+
+    const name = (product.name || '').toLowerCase();
+    const category =
+      typeof product.category === 'string'
+        ? product.category.toLowerCase()
+        : '';
+
+    return (
+      name.includes(selectedCategory.toLowerCase()) ||
+      category.includes(selectedCategory.toLowerCase())
+    );
+  });
+
+  const displayProducts = filteredProducts.slice(0, 8);
 
   return (
     <section className="py-16 bg-white">
@@ -31,16 +56,16 @@ export const PopularFashion = ({ products, onAddToCart, onLoginRequired }: Popul
         <h2 className="text-3xl font-bold text-gray-900 mb-12">Popular Fashion</h2>
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          {/* Left Sidebar */}
+
+          {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-20">
-              {/* Categories */}
               <nav className="space-y-3 mb-8">
                 {categories.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`block w-full text-left py-2 px-3 rounded transition-colors text-sm ${
+                    className={`block w-full text-left py-2 px-3 rounded text-sm ${
                       selectedCategory === cat
                         ? 'bg-blue-100 text-blue-600 font-semibold'
                         : 'text-gray-700 hover:bg-gray-100'
@@ -51,7 +76,6 @@ export const PopularFashion = ({ products, onAddToCart, onLoginRequired }: Popul
                 ))}
               </nav>
 
-              {/* Price Tag */}
               <div className="bg-green-500 text-white rounded-full w-24 h-24 flex items-center justify-center mx-auto">
                 <div className="text-center">
                   <div className="text-xl">$</div>
@@ -61,7 +85,7 @@ export const PopularFashion = ({ products, onAddToCart, onLoginRequired }: Popul
             </div>
           </div>
 
-          {/* Products Grid */}
+          {/* Products */}
           <div className="lg:col-span-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {displayProducts.map((product) => (
@@ -75,6 +99,7 @@ export const PopularFashion = ({ products, onAddToCart, onLoginRequired }: Popul
               ))}
             </div>
           </div>
+
         </div>
       </div>
     </section>

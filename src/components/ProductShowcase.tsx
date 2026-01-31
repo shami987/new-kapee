@@ -1,19 +1,32 @@
 import { useState, useEffect } from 'react';
-import type { Product, Category } from '../types';
+import type { Product } from '../types';
 import { ProductCard } from './ProductCard';
+import { getProducts } from '../services/productService';
 
 interface ProductShowcaseProps {
-  products: Product[];
-  categories: Category[];
   onAddToCart: (product: Product) => void;
   onLoginRequired?: () => void;
 }
 
-export const ProductShowcase = ({ products, onAddToCart, onLoginRequired }: ProductShowcaseProps) => {
-  const [selectedCategory, setSelectedCategory] = useState('Men\'s Fashion');
+export const ProductShowcase = ({ onAddToCart, onLoginRequired }: ProductShowcaseProps) => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState("Men's Fashion");
   const [bannerIndex, setBannerIndex] = useState(0);
-  
-  // Static banner slides - Change image URLs here
+
+  // 🔹 Fetch products from backend
+  useEffect(() => {
+    getProducts()
+      .then((data) => {
+        setProducts(data);
+      })
+      .catch((err) => {
+        console.error('Failed to fetch products', err);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Banner slides (still static – this is OK)
   const bannerSlides = [
     {
       image: 'https://kapee.presslayouts.com/wp-content/uploads/2019/06/Product-box-banner-3.jpg',
@@ -32,117 +45,100 @@ export const ProductShowcase = ({ products, onAddToCart, onLoginRequired }: Prod
     }
   ];
 
-  // Auto-scroll banner every 4 seconds
+  // Auto-scroll banner
   useEffect(() => {
     const timer = setInterval(() => {
       setBannerIndex((prev) => (prev + 1) % bannerSlides.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, [bannerSlides.length]);
+  }, []);
 
-  // Show only 6 products, no filtering
+  // Show only first 6 products
   const displayProducts = products.slice(0, 6);
+
+  if (loading) {
+    return (
+      <section className="py-12 text-center text-gray-500">
+        Loading products...
+      </section>
+    );
+  }
 
   return (
     <section className="py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
-          {/* Left Column - Sidebar only */}
+
+          {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="text-lg font-bold text-blue-600 mb-4">{selectedCategory}</h3>
-              
-              <nav className="space-y-2">
-                {['Men\'s Fashion', 'Women\'s Fashion', 'Shoes', 'Accessories'].map((cat) => (
-                  <div key={cat}>
-                    <button
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`block w-full text-left py-1 px-2 text-sm rounded transition-colors ${
-                        selectedCategory === cat
-                          ? 'bg-blue-600 text-white font-semibold'
-                          : 'text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  </div>
-                ))}
-              </nav>
+              <h3 className="text-lg font-bold text-blue-600 mb-4">
+                {selectedCategory}
+              </h3>
 
-              {/* Price Tag */}
-              <div className="mt-6 bg-green-500 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto">
-                <div className="text-center">
-                  <div className="text-xs">$</div>
-                  <div className="text-xl font-bold">39</div>
-                </div>
-              </div>
+              {["Men's Fashion", "Women's Fashion", "Shoes", "Accessories"].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`block w-full text-left py-1 px-2 text-sm rounded ${
+                    selectedCategory === cat
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Center Column - Automatic Banner Carousel */}
+          {/* Banner */}
           <div className="lg:col-span-2">
             <div className="relative rounded-lg overflow-hidden h-96">
-              {/* Banner Carousel */}
-              <div className="relative w-full h-full">
-                {bannerSlides.map((slide, index) => (
-                  <div
-                    key={index}
-                    className={`absolute inset-0 transition-opacity duration-1000 ${
-                      index === bannerIndex ? 'opacity-100' : 'opacity-0'
-                    }`}
-                    style={{
-                      backgroundImage: `url(${slide.image})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-                  </div>
-                ))}
-              </div>
+              {bannerSlides.map((slide, index) => (
+                <div
+                  key={index}
+                  className={`absolute inset-0 transition-opacity duration-1000 ${
+                    index === bannerIndex ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  style={{
+                    backgroundImage: `url(${slide.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                  }}
+                />
+              ))}
 
-              {/* Text Overlay */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-4 z-10">
-                <h2 className="text-2xl md:text-3xl font-bold mb-2">{bannerSlides[bannerIndex].title}</h2>
-                <p className="text-lg md:text-xl font-semibold">{bannerSlides[bannerIndex].offer}</p>
-              </div>
-
-              {/* Carousel Indicators */}
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
-                {bannerSlides.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setBannerIndex(index)}
-                    className={`w-2 h-2 rounded-full transition-colors ${
-                      index === bannerIndex ? 'bg-white' : 'bg-white bg-opacity-50'
-                    }`}
-                  />
-                ))}
+              <div className="absolute inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center text-white">
+                <h2 className="text-2xl font-bold">
+                  {bannerSlides[bannerIndex].title}
+                </h2>
+                <p className="text-lg">{bannerSlides[bannerIndex].offer}</p>
               </div>
             </div>
           </div>
 
-          {/* Right Column - 6 Products Grid */}
+          {/* Products */}
           <div className="lg:col-span-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {displayProducts.length > 0 ? (
                 displayProducts.map((product) => (
-                  <div key={product._id} className="h-full">
-                    <ProductCard
-                      product={product}
-                      onAddToCart={onAddToCart}
-                      onLoginRequired={onLoginRequired}
-                      isFeatured={product.isSale || product.isNew}
-                    />
-                  </div>
+                  <ProductCard
+                    key={product._id}
+                    product={product}
+                    onAddToCart={onAddToCart}
+                    onLoginRequired={onLoginRequired}
+                    isFeatured={product.isSale || product.isNew}
+                  />
                 ))
               ) : (
-                <div className="col-span-full text-center py-12">
-                  <p className="text-gray-500 text-lg">No products found.</p>
-                </div>
+                <p className="col-span-full text-center text-gray-500">
+                  No products found
+                </p>
               )}
             </div>
           </div>
+
         </div>
       </div>
     </section>
