@@ -1,11 +1,7 @@
-import { useState, useEffect } from 'react';
 import { AdminLayout, StatCard, RevenueChart, TopProducts, RecentOrders, AnalyticsOverview, QuickActions } from '../components';
 import { TrendingUp, Users, ShoppingCart, DollarSign } from 'lucide-react';
-import { useAdminStats, useAdminOrders } from '../hooks/useAdminData';
 
 export const AdminDashboard = () => {
-  const { stats, loading: statsLoading } = useAdminStats();
-  const { orders, loading: ordersLoading } = useAdminOrders();
   
   // Mock data for charts - replace with real API data
   const revenueData = [
@@ -56,16 +52,6 @@ export const AdminDashboard = () => {
     console.log('View order:', orderId);
     // Navigate to order details page
   };
-
-  if (statsLoading || ordersLoading) {
-    return (
-      <AdminLayout title="Dashboard">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
-      </AdminLayout>
-    );
-  }
 
   return (
     <AdminLayout title="Dashboard">

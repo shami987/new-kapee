@@ -1,30 +1,18 @@
 import { useState, useEffect } from 'react';
 import type { Product } from '../types';
 import { ProductCard } from './ProductCard';
-import { getProducts } from '../services/productService';
 
 interface ProductShowcaseProps {
+  products: Product[];
   onAddToCart: (product: Product) => void;
   onLoginRequired?: () => void;
 }
 
-export const ProductShowcase = ({ onAddToCart, onLoginRequired }: ProductShowcaseProps) => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+export const ProductShowcase = ({ products, onAddToCart, onLoginRequired }: ProductShowcaseProps) => {
   const [selectedCategory, setSelectedCategory] = useState("Men's Fashion");
   const [bannerIndex, setBannerIndex] = useState(0);
 
-  // 🔹 Fetch products from backend
-  useEffect(() => {
-    getProducts()
-      .then((data) => {
-        setProducts(data);
-      })
-      .catch((err) => {
-        console.error('Failed to fetch products', err);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+
 
   // Banner slides (still static – this is OK)
   const bannerSlides = [
@@ -56,7 +44,7 @@ export const ProductShowcase = ({ onAddToCart, onLoginRequired }: ProductShowcas
   // Show only first 6 products
   const displayProducts = products.slice(0, 6);
 
-  if (loading) {
+  if (products.length === 0) {
     return (
       <section className="py-12 text-center text-gray-500">
         Loading products...

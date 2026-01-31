@@ -1,15 +1,14 @@
 import type { Product } from '../types';
 import { ProductCard } from './ProductCard';
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { getAllProducts } from '../services/productService';
 
 interface WomenShowcaseProps {
+  products: Product[];
   onAddToCart: (product: Product) => void;
   onLoginRequired?: () => void;
 }
 
-export const WomenShowcase = ({ onAddToCart, onLoginRequired }: WomenShowcaseProps) => {
+export const WomenShowcase = ({ products, onAddToCart, onLoginRequired }: WomenShowcaseProps) => {
   const [bannerIndex, setBannerIndex] = useState(0);
 
   const bannerSlides = [
@@ -25,14 +24,7 @@ export const WomenShowcase = ({ onAddToCart, onLoginRequired }: WomenShowcasePro
     return () => clearInterval(timer);
   }, []);
 
-  // 🔥 FETCH FROM BACKEND
-  const { data: products = [], isLoading, error } = useQuery({
-    queryKey: ['products'],
-    queryFn: getAllProducts,
-  });
 
-  if (isLoading) return <p className="text-center py-12">Loading women products...</p>;
-  if (error) return <p className="text-center py-12 text-red-500">Failed to load products</p>;
 
   // Filter women products
   const womenProducts = products.filter((p) =>

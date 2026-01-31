@@ -19,8 +19,8 @@ export const RevenueChart = ({ data }: RevenueChartProps) => {
           <YAxis />
           <Tooltip 
             formatter={(value, name) => [
-              name === 'revenue' ? `$${value.toLocaleString()}` : value,
-              name === 'revenue' ? 'Revenue' : 'Orders'
+              name === 'revenue' ? `$${(value as number).toLocaleString()}` : value,
+            name === 'revenue' ? 'Revenue' : 'Orders'
             ]}
           />
           <Line 

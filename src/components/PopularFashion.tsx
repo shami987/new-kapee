@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import type { Product } from '../types';
 import { ProductCard } from './ProductCard';
-import { useQuery } from '@tanstack/react-query';
-import { getAllProducts } from '../services/productService';
 
 interface PopularFashionProps {
+  products: Product[];
   onAddToCart: (product: Product) => void;
   onLoginRequired?: () => void;
 }
 
-export const PopularFashion = ({ onAddToCart, onLoginRequired }: PopularFashionProps) => {
+export const PopularFashion = ({ products, onAddToCart, onLoginRequired }: PopularFashionProps) => {
   const [selectedCategory, setSelectedCategory] = useState('Women');
 
   const categories = [
@@ -23,14 +22,7 @@ export const PopularFashion = ({ onAddToCart, onLoginRequired }: PopularFashionP
     'Bags & Backpacks'
   ];
 
-  // 🔥 Fetch products from backend
-  const { data: products = [], isLoading, error } = useQuery({
-    queryKey: ['products'],
-    queryFn: getAllProducts,
-  });
 
-  if (isLoading) return <p className="text-center py-12">Loading products...</p>;
-  if (error) return <p className="text-center py-12 text-red-500">Failed to load products</p>;
 
   // 🔎 Filter by selected category
   const filteredProducts = products.filter((product) => {

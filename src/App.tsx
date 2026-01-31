@@ -115,7 +115,6 @@ function App() {
         
         <ProductShowcase 
           products={products} 
-          categories={categories}
           onAddToCart={addToCart}
           onLoginRequired={() => setIsLoginModalOpen(true)}
         />
