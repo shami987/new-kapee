@@ -54,8 +54,7 @@ function App() {
     updateQuantity,
     getTotalPrice,
     getTotalItems,
-    isLoading,
-    error
+    isLoading
   } = useCart();
 
   const { isLoggedIn } = useAuth();

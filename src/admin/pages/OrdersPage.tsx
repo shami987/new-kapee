@@ -15,12 +15,10 @@ export const OrdersPage = () => {
 
   // Use custom hook to manage orders data and API calls
   const {
-    orders,
     loading,
     error,
     stats,
     fetchOrders,
-    updateOrderStatus,
     deleteOrder,
     filterOrders,
   } = useOrders();
@@ -43,15 +41,6 @@ export const OrdersPage = () => {
   const handleFilterChange = (newFilters: any) => {
     setFilters(newFilters);
     setCurrentPage(1); // Reset to first page when filters change
-  };
-
-  // Handle order status update
-  const handleStatusUpdate = async (orderId: string, newStatus: Order['status']) => {
-    const success = await updateOrderStatus(orderId, newStatus);
-    if (success) {
-      // Show success message or toast notification here
-      console.log('Order status updated successfully');
-    }
   };
 
   // Handle order deletion

@@ -1,5 +1,4 @@
 import type { Product } from '../types';
-import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ProductCard } from './ProductCard';
 import { products as localProducts } from '../data/products';
@@ -14,7 +13,6 @@ export const FeaturedProducts = ({
   onLoginRequired?: () => void;
   onViewAll?: () => void;
 }) => {
-  const navigate = useNavigate();
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ['products'],

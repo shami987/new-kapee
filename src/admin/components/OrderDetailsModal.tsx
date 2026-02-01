@@ -1,4 +1,4 @@
-import { X, Package, User, Calendar, CreditCard, MapPin } from 'lucide-react';
+import { X, Package, User, CreditCard, MapPin } from 'lucide-react';
 
 interface OrderDetailsModalProps {
   isOpen: boolean;

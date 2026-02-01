@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Filter, Calendar, Download } from 'lucide-react';
+import { Filter, Download } from 'lucide-react';
 
 interface OrderFiltersProps {
   onFilterChange: (filters: any) => void;
