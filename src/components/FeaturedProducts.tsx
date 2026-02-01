@@ -50,7 +50,6 @@ export const FeaturedProducts = ({
               <div
                 key={product._id}
                 className="w-72 flex-shrink-0"
-                onClick={() => navigate(`/product/${product._id}`)}
               >
                 <ProductCard
                   product={product}

@@ -6,6 +6,7 @@ import { Star, Heart, Share2, Truck, HelpCircle, Minus, Plus } from 'lucide-reac
 import { Header } from '../components/Header';
 import { CartSidebar } from '../components/CartSidebar';
 import { useCart } from '../hooks/useCart';
+import { useAuth } from '../contexts/AuthContext';
 import { getProductById } from '../services/productService';
 import { products as localProducts } from '../data/products';
 
@@ -23,8 +24,11 @@ export const ProductDetailPage = () => {
     getTotalItems,
     removeFromCart,
     updateQuantity,
-    getTotalPrice
+    getTotalPrice,
+    isLoading: cartLoading
   } = useCart();
+
+  const { isLoggedIn } = useAuth();
 
   const { data: fetchedProduct, isLoading } = useQuery({
     queryKey: ['product', id],
@@ -61,6 +65,8 @@ export const ProductDetailPage = () => {
         onUpdateQuantity={updateQuantity}
         onRemoveItem={removeFromCart}
         totalPrice={getTotalPrice}
+        isLoading={cartLoading}
+        isBackend={isLoggedIn}
       />
 
       <div className="max-w-7xl mx-auto px-4 py-6">

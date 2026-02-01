@@ -18,7 +18,7 @@ export const useCart = () => {
   });
 
   // Fetch cart from backend for logged-in users
-  const { data: backendCartItems = [] } = useQuery({
+  const { data: backendCartItems = [], isLoading, error } = useQuery({
     queryKey: ['cart'],
     queryFn: async () => {
       console.log('💾 Fetching cart from backend...');
@@ -32,16 +32,20 @@ export const useCart = () => {
       }
     },
     enabled: isLoggedIn,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Use backend cart if logged in AND backend has data, otherwise local cart
-  const cartItems: CartItem[] = isLoggedIn && Array.isArray(backendCartItems) && backendCartItems.length > 0 ? backendCartItems : localCartItems;
+  // Use backend cart if logged in, otherwise local cart
+  const cartItems: CartItem[] = isLoggedIn ? (Array.isArray(backendCartItems) ? backendCartItems : []) : localCartItems;
   
   console.log('Cart status:', { 
     isLoggedIn, 
     backendItems: Array.isArray(backendCartItems) ? backendCartItems.length : 0, 
     localItems: localCartItems.length,
-    usingBackend: isLoggedIn && Array.isArray(backendCartItems) && backendCartItems.length > 0
+    usingBackend: isLoggedIn,
+    isLoading,
+    error: error?.message
   });
 
   // Update local storage when local cart changes
@@ -155,12 +159,12 @@ export const useCart = () => {
   };
 
   const getTotalPrice = useMemo(
-    () => cartItems.reduce((total: number, item: CartItem) => total + item.price * item.quantity, 0),
+    () => Array.isArray(cartItems) ? cartItems.reduce((total: number, item: CartItem) => total + item.price * item.quantity, 0) : 0,
     [cartItems]
   );
 
   const getTotalItems = useMemo(
-    () => cartItems.reduce((total: number, item: CartItem) => total + item.quantity, 0),
+    () => Array.isArray(cartItems) ? cartItems.reduce((total: number, item: CartItem) => total + item.quantity, 0) : 0,
     [cartItems]
   );
 
@@ -226,9 +230,10 @@ export const useCart = () => {
     updateQuantity,
     getTotalPrice,
     getTotalItems,
-    clearCart
-    ,
+    clearCart,
     buildOrder,
-    checkout
+    checkout,
+    isLoading,
+    error
   };
 };

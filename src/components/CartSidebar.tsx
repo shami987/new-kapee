@@ -9,6 +9,8 @@ interface CartSidebarProps {
   onUpdateQuantity: (productId: string, quantity: number) => void;
   onRemoveItem: (productId: string) => void;
   totalPrice: number;
+  isLoading?: boolean;
+  isBackend?: boolean;
 }
 
 export const CartSidebar = ({
@@ -17,7 +19,9 @@ export const CartSidebar = ({
   cartItems,
   onUpdateQuantity,
   onRemoveItem,
-  totalPrice
+  totalPrice,
+  isLoading = false,
+  isBackend = false
 }: CartSidebarProps) => {
   const navigate = useNavigate();
   if (!isOpen) return null;
@@ -37,14 +41,19 @@ export const CartSidebar = ({
           </button>
           <div className="flex-1 text-center">
             <h2 className="text-xl font-bold">MY CART</h2>
-            <p className="text-xs opacity-75">({cartItems.length > 0 && typeof cartItems[0]._id === 'string' ? 'Backend' : 'Local'})</p>
+            <p className="text-xs opacity-75">({isBackend ? 'Backend' : 'Local'})</p>
           </div>
           <div className="w-8"></div>
         </div>
         
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {cartItems.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center mt-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="text-gray-500 mt-2">Loading cart...</p>
+            </div>
+          ) : cartItems.length === 0 ? (
             <p className="text-gray-500 text-center mt-8">Your cart is empty</p>
           ) : (
             cartItems.map((item) => (

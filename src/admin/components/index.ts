@@ -7,3 +7,7 @@ export { TopProducts } from './TopProducts';
 export { RecentOrders } from './RecentOrders';
 export { AnalyticsOverview } from './AnalyticsOverview';
 export { QuickActions } from './QuickActions';
+export { OrderFilters } from './OrderFilters';
+export { OrderDetailsModal } from './OrderDetailsModal';
+export { OrderStats } from './OrderStats';
+export { ErrorBoundary, withErrorBoundary } from './ErrorBoundary';

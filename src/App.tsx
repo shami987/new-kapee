@@ -14,6 +14,7 @@ import { ProductFilters } from './components/ProductFilters';
 import { SignupModal } from './components/SignupModal';
 import { LoginModal } from './components/LoginModal';
 import { useCart } from './hooks/useCart';
+import { useAuth } from './contexts/AuthContext';
 import { products, categories } from './data/products';
 
 const footerLinks = {
@@ -52,8 +53,12 @@ function App() {
     removeFromCart,
     updateQuantity,
     getTotalPrice,
-    getTotalItems
+    getTotalItems,
+    isLoading,
+    error
   } = useCart();
+
+  const { isLoggedIn } = useAuth();
 
   const filteredProducts = useMemo(() => {
     let filtered = products.filter(product => {
@@ -208,6 +213,8 @@ function App() {
         onUpdateQuantity={updateQuantity}
         onRemoveItem={removeFromCart}
         totalPrice={getTotalPrice}
+        isLoading={isLoading}
+        isBackend={isLoggedIn}
       />
 
       {/* Login modal - opens when user tries to add to cart without logging in */}
