@@ -22,14 +22,8 @@ export const ProductCard = ({ product, onAddToCart, onLoginRequired, isFeatured 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    // Check if user is logged in
-    if (!isLoggedIn) {
-      onLoginRequired?.();
-      return;
-    }
-    
     try {
-      // Add to cart using backend API
+      // Add to cart (works for both logged in and non-logged in users)
       await addToCart(product, 1);
       
       // Show success toast
@@ -39,6 +33,10 @@ export const ProductCard = ({ product, onAddToCart, onLoginRequired, isFeatured 
       onAddToCart?.(product);
     } catch (error) {
       console.error('Failed to add to cart:', error);
+      // If user is not logged in and backend fails, still show login modal
+      if (!isLoggedIn) {
+        onLoginRequired?.();
+      }
     }
   };
 
@@ -112,12 +110,8 @@ export const ProductCard = ({ product, onAddToCart, onLoginRequired, isFeatured 
           
           <button
             onClick={handleAddToCart}
-            className={`w-full text-white px-3 py-2 rounded-md transition-colors flex items-center justify-center space-x-1 ${
-              !isLoggedIn
-                ? 'bg-gray-400 cursor-not-allowed hover:bg-gray-500'
-                : 'bg-blue-600 hover:bg-blue-700'
-            }`}
-            title={!isLoggedIn ? 'Please log in to add items to cart' : 'Add to cart'}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md transition-colors flex items-center justify-center space-x-1"
+            title="Add to cart"
           >
             <ShoppingCart className="h-4 w-4" />
             <span>Add to Cart</span>

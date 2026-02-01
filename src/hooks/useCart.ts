@@ -25,7 +25,9 @@ export const useCart = () => {
       try {
         const res = await cartAPI.getCart();
         console.log('💾 Backend cart response:', res.data);
-        return res.data as CartItem[];
+        // Backend returns a cart object with items array, extract the items
+        const cartData = res.data;
+        return Array.isArray(cartData) ? cartData : (cartData?.items || []);
       } catch (error) {
         console.error('❌ Failed to fetch cart from backend:', error);
         return [] as CartItem[];
@@ -39,11 +41,12 @@ export const useCart = () => {
   // Use backend cart if logged in, otherwise local cart
   const cartItems: CartItem[] = isLoggedIn ? (Array.isArray(backendCartItems) ? backendCartItems : []) : localCartItems;
   
-  console.log('Cart status:', { 
+  console.log('🛒 Cart Debug:', { 
     isLoggedIn, 
-    backendItems: Array.isArray(backendCartItems) ? backendCartItems.length : 0, 
-    localItems: localCartItems.length,
-    usingBackend: isLoggedIn,
+    backendItems: Array.isArray(backendCartItems) ? backendCartItems : 'not array', 
+    localItems: localCartItems,
+    finalCartItems: cartItems,
+    cartLength: cartItems.length,
     isLoading,
     error: error?.message
   });
@@ -75,15 +78,23 @@ export const useCart = () => {
     mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) => 
       cartAPI.updateCartItem(productId, quantity),
     onSuccess: () => {
+      console.log('✅ Backend update successful');
       queryClient.invalidateQueries({ queryKey: ['cart'] });
     },
+    onError: (error) => {
+      console.error('❌ Backend update failed:', error);
+    }
   });
 
   const removeFromCartMutation = useMutation({
     mutationFn: (productId: string) => cartAPI.removeFromCart(productId),
     onSuccess: () => {
+      console.log('✅ Backend removal successful');
       queryClient.invalidateQueries({ queryKey: ['cart'] });
     },
+    onError: (error) => {
+      console.error('❌ Backend removal failed:', error);
+    }
   });
 
   const addToCart = async (product: Product, quantity: number = 1) => {
@@ -125,26 +136,35 @@ export const useCart = () => {
   };
 
   const removeFromCart = (productId: string) => {
+    console.log('🗑️ Removing from cart:', productId, 'isLoggedIn:', isLoggedIn);
+    
     if (isLoggedIn) {
-      // Remove from backend cart
-      removeFromCartMutation.mutate(productId);
+      // Find the cart item and get the actual product ID
+      const cartItem = cartItems.find(item => item._id === productId);
+      const actualProductId = cartItem?.product?._id || productId;
+      console.log('🗑️ Using product ID for backend:', actualProductId);
+      removeFromCartMutation.mutate(actualProductId);
     } else {
-      // Remove from local cart
+      // Use local storage for non-logged-in users
       setLocalCartItems(prev => prev.filter(item => item._id !== productId));
     }
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
+    console.log('🔄 Updating quantity:', productId, 'to', quantity, 'isLoggedIn:', isLoggedIn);
     if (quantity <= 0) {
       removeFromCart(productId);
       return;
     }
     
     if (isLoggedIn) {
-      // Update backend cart
-      updateCartMutation.mutate({ productId, quantity });
+      // Find the cart item and get the actual product ID
+      const cartItem = cartItems.find(item => item._id === productId);
+      const actualProductId = cartItem?.product?._id || productId;
+      console.log('🔄 Using product ID for backend:', actualProductId);
+      updateCartMutation.mutate({ productId: actualProductId, quantity });
     } else {
-      // Update local cart
+      // Use local storage for non-logged-in users
       setLocalCartItems(prev =>
         prev.map(item =>
           item._id === productId ? { ...item, quantity } : item
@@ -153,15 +173,24 @@ export const useCart = () => {
     }
   };
 
-  const getTotalPrice = useMemo(
-    () => Array.isArray(cartItems) ? cartItems.reduce((total: number, item: CartItem) => total + item.price * item.quantity, 0) : 0,
-    [cartItems]
-  );
+  const getTotalPrice = useMemo(() => {
+    if (!Array.isArray(cartItems)) return 0;
+    return cartItems.reduce((total: number, item: CartItem) => {
+      const product = item.product || item; // Handle nested product structure
+      const price = Number(product.price || product.productPrice || product.unitPrice || 0);
+      const quantity = Number(item.quantity || 1);
+      console.log('Price calculation:', { item: product.name, price, quantity, subtotal: price * quantity });
+      return total + (price * quantity);
+    }, 0);
+  }, [cartItems]);
 
-  const getTotalItems = useMemo(
-    () => Array.isArray(cartItems) ? cartItems.reduce((total: number, item: CartItem) => total + item.quantity, 0) : 0,
-    [cartItems]
-  );
+  const getTotalItems = useMemo(() => {
+    if (!Array.isArray(cartItems)) return 0;
+    return cartItems.reduce((total: number, item: CartItem) => {
+      const quantity = item.quantity || 1;
+      return total + quantity;
+    }, 0);
+  }, [cartItems]);
 
   const clearCart = () => {
     if (isLoggedIn) {

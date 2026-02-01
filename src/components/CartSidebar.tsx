@@ -24,6 +24,16 @@ export const CartSidebar = ({
   isBackend = false
 }: CartSidebarProps) => {
   const navigate = useNavigate();
+  
+  console.log('🛒 CartSidebar Debug:', {
+    isOpen,
+    cartItems,
+    cartItemsLength: cartItems?.length,
+    totalPrice,
+    isLoading,
+    isBackend
+  });
+  
   if (!isOpen) return null;
 
   const freeShippingThreshold = 120;
@@ -56,23 +66,42 @@ export const CartSidebar = ({
           ) : cartItems.length === 0 ? (
             <p className="text-gray-500 text-center mt-8">Your cart is empty</p>
           ) : (
-            cartItems.map((item) => (
-              <div key={item._id} className="border-b pb-6">
+            cartItems.map((item) => {
+              console.log('📝 Cart item structure:', item);
+              // Handle different item structures from backend vs local
+              const product = item.product || item; // Backend has nested product, local doesn't
+              const itemData = {
+                _id: item._id || item.productId || item.id,
+                name: product.name || product.productName || product.title || 'Unknown Product',
+                price: Number(product.price || product.productPrice || product.unitPrice || 0),
+                image: product.image || product.productImage || product.imageUrl || product.thumbnail || '/placeholder-image.svg',
+                quantity: Number(item.quantity || 1)
+              };
+              console.log('📝 Normalized item data:', itemData);
+              return (
+              <div key={itemData._id} className="border-b pb-6">
                 <div className="flex gap-4">
                   <img
-                    src={item.image}
-                    alt={item.name}
+                    src={itemData.image}
+                    alt={itemData.name}
                     className="w-20 h-20 object-cover rounded"
                     loading="lazy"
                     decoding="async"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder-image.svg';
+                    }}
                   />
                   
                   <div className="flex-1">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-semibold text-sm text-gray-900">{item.name}</h3>
+                      <h3 className="font-semibold text-sm text-gray-900">{itemData.name}</h3>
                       <button
-                        onClick={() => onRemoveItem(item._id)}
+                        onClick={() => {
+                          console.log('Removing item:', itemData._id);
+                          onRemoveItem(itemData._id);
+                        }}
                         className="text-red-500 hover:text-red-700 p-1"
+                        title="Remove item"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -81,29 +110,37 @@ export const CartSidebar = ({
                     <div className="flex items-center space-x-3 mb-3">
                       <button
                         onClick={() => {
-                          const newQuantity = item.quantity - 1;
+                          const newQuantity = itemData.quantity - 1;
+                          console.log('Decreasing quantity:', itemData._id, 'from', itemData.quantity, 'to', newQuantity);
                           if (newQuantity >= 1) {
-                            onUpdateQuantity(item._id, newQuantity);
+                            onUpdateQuantity(itemData._id, newQuantity);
                           }
                         }}
                         className="p-1 hover:bg-gray-200 rounded"
+                        title="Decrease quantity"
                       >
                         <Minus className="h-3 w-3" />
                       </button>
-                      <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
+                      <span className="text-sm font-medium w-6 text-center">{itemData.quantity}</span>
                       <button
-                        onClick={() => onUpdateQuantity(item._id, item.quantity + 1)}
+                        onClick={() => {
+                          const newQuantity = itemData.quantity + 1;
+                          console.log('Increasing quantity:', itemData._id, 'from', itemData.quantity, 'to', newQuantity);
+                          onUpdateQuantity(itemData._id, newQuantity);
+                        }}
                         className="p-1 hover:bg-gray-200 rounded"
+                        title="Increase quantity"
                       >
                         <Plus className="h-3 w-3" />
                       </button>
                     </div>
                     
-                    <p className="text-sm text-gray-600">{item.quantity} × ${item.price.toFixed(2)}</p>
+                    <p className="text-sm text-gray-600">{itemData.quantity} × ${itemData.price.toFixed(2)}</p>
                   </div>
                 </div>
               </div>
-            ))
+            );
+            })
           )}
         </div>
 

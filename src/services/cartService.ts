@@ -9,11 +9,11 @@ export const cartAPI = {
   addToCart: (productId: string, quantity: number = 1) => 
     apiClient.post('/cart', { productId, quantity }),
   
-  // Update item quantity
+  // Update item quantity - PUT /cart/:productId
   updateCartItem: (productId: string, quantity: number) => 
     apiClient.put(`/cart/${productId}`, { quantity }),
   
-  // Remove item from cart
+  // Remove item from cart - DELETE /cart/:productId
   removeFromCart: (productId: string) => 
     apiClient.delete(`/cart/${productId}`),
   
