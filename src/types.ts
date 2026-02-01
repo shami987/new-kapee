@@ -14,6 +14,9 @@ export interface Product {
 
 export interface CartItem extends Product {
   quantity: number;
+  product?: Product; // For backend cart items with nested product
+  productId?: string; // Alternative ID field
+  id?: string; // Alternative ID field
 }
 
 export interface Category {

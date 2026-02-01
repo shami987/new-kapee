@@ -26,7 +26,7 @@ export const useCart = () => {
         const res = await cartAPI.getCart();
         console.log('💾 Backend cart response:', res.data);
         // Backend returns a cart object with items array, extract the items
-        const cartData = res.data;
+        const cartData = res.data as any;
         return Array.isArray(cartData) ? cartData : (cartData?.items || []);
       } catch (error) {
         console.error('❌ Failed to fetch cart from backend:', error);
@@ -177,7 +177,7 @@ export const useCart = () => {
     if (!Array.isArray(cartItems)) return 0;
     return cartItems.reduce((total: number, item: CartItem) => {
       const product = item.product || item; // Handle nested product structure
-      const price = Number(product.price || product.productPrice || product.unitPrice || 0);
+      const price = Number(product.price || 0);
       const quantity = Number(item.quantity || 1);
       console.log('Price calculation:', { item: product.name, price, quantity, subtotal: price * quantity });
       return total + (price * quantity);

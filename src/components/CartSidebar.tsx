@@ -71,10 +71,10 @@ export const CartSidebar = ({
               // Handle different item structures from backend vs local
               const product = item.product || item; // Backend has nested product, local doesn't
               const itemData = {
-                _id: item._id || item.productId || item.id,
-                name: product.name || product.productName || product.title || 'Unknown Product',
-                price: Number(product.price || product.productPrice || product.unitPrice || 0),
-                image: product.image || product.productImage || product.imageUrl || product.thumbnail || '/placeholder-image.svg',
+                _id: item._id || item.productId || item.id || '',
+                name: product.name || 'Unknown Product',
+                price: Number(product.price || 0),
+                image: product.image || '/placeholder-image.svg',
                 quantity: Number(item.quantity || 1)
               };
               console.log('📝 Normalized item data:', itemData);
