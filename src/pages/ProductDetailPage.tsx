@@ -160,8 +160,8 @@ export const ProductDetailPage = () => {
               </div>
 
               <button
-                onClick={() => {
-                  addToCart(product, quantity);
+                onClick={async () => {
+                  await addToCart(product, quantity);
                   setIsCartOpen(true);
                 }}
                 className="bg-orange-500 text-white px-8 py-3 rounded hover:bg-orange-600"

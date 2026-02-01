@@ -86,34 +86,29 @@ export const useCart = () => {
     },
   });
 
-  const addToCart = (product: Product, quantity: number = 1) => {
+  const addToCart = async (product: Product, quantity: number = 1) => {
     console.log('Adding to cart:', { product: product.name, quantity, isLoggedIn });
     
     if (isLoggedIn) {
-      // Try backend cart API first
       console.log('Using backend cart API');
-      addToCartMutation.mutate(
-        { productId: product._id, quantity },
-        {
-          onError: () => {
-            // If backend fails, fallback to local storage
-            console.log('Backend failed, using local storage fallback');
-            setLocalCartItems(prev => {
-              const existing = prev.find(item => item._id === product._id);
-              if (existing) {
-                return prev.map(item =>
-                  item._id === product._id
-                    ? { ...item, quantity: item.quantity + quantity }
-                    : item
-                );
-              }
-              return [...prev, { ...product, quantity }];
-            });
+      try {
+        await addToCartMutation.mutateAsync({ productId: product._id, quantity });
+        console.log('✅ Successfully added to backend cart');
+      } catch (error) {
+        console.error('❌ Backend cart failed:', error);
+        setLocalCartItems(prev => {
+          const existing = prev.find(item => item._id === product._id);
+          if (existing) {
+            return prev.map(item =>
+              item._id === product._id
+                ? { ...item, quantity: item.quantity + quantity }
+                : item
+            );
           }
-        }
-      );
+          return [...prev, { ...product, quantity }];
+        });
+      }
     } else {
-      // Add to local cart
       console.log('Using local cart storage');
       setLocalCartItems(prev => {
         const existing = prev.find(item => item._id === product._id);
