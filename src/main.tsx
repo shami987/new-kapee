@@ -11,7 +11,7 @@ import { OrderCompletePage } from './pages/OrderCompletePage.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx'
 import { AdminDashboard, OrdersPage, ProductsPage, CustomersPage } from './admin'
 import { AdminAddProduct } from './pages/admin/AdminAddProduct.tsx'
-import { AdminCartManagement } from './admin/pages/AdminCartManagement.tsx'
+import { CartsPage } from './admin/pages/CartsPage.tsx'
 
 
 // Create React Query client
@@ -49,7 +49,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/admin/orders" element={<OrdersPage />} />
             <Route path="/admin/products" element={<ProductsPage />} />
             <Route path="/admin/products/add" element={<AdminAddProduct />} />
-            <Route path="/admin/carts" element={<AdminCartManagement />} />
+            <Route path="/admin/carts" element={<CartsPage />} />
             <Route path="/admin/customers" element={<CustomersPage />} />
             
             {/* Fallback empty route */}

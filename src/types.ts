@@ -64,3 +64,28 @@ export interface DashboardStats {
     offline: number;
   };
 }
+
+export interface User {
+  _id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminCart {
+  _id: string;
+  userId: string;
+  user?: User;
+  items: Array<{
+    product: {
+      _id: string;
+      name: string;
+      price: number;
+      image: string;
+    };
+    quantity: number;
+  }>;
+  createdAt: string;
+  updatedAt: string;
+}

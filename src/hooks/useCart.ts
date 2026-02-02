@@ -100,38 +100,18 @@ export const useCart = () => {
   const addToCart = async (product: Product, quantity: number = 1) => {
     console.log('Adding to cart:', { product: product.name, quantity, isLoggedIn });
     
-    if (isLoggedIn) {
-      console.log('Using backend cart API');
-      try {
-        await addToCartMutation.mutateAsync({ productId: product._id, quantity });
-        console.log('✅ Successfully added to backend cart');
-      } catch (error) {
-        console.error('❌ Backend cart failed:', error);
-        setLocalCartItems(prev => {
-          const existing = prev.find(item => item._id === product._id);
-          if (existing) {
-            return prev.map(item =>
-              item._id === product._id
-                ? { ...item, quantity: item.quantity + quantity }
-                : item
-            );
-          }
-          return [...prev, { ...product, quantity }];
-        });
-      }
-    } else {
-      console.log('Using local cart storage');
-      setLocalCartItems(prev => {
-        const existing = prev.find(item => item._id === product._id);
-        if (existing) {
-          return prev.map(item =>
-            item._id === product._id
-              ? { ...item, quantity: item.quantity + quantity }
-              : item
-          );
-        }
-        return [...prev, { ...product, quantity }];
-      });
+    if (!isLoggedIn) {
+      alert('Please log in to add items to cart');
+      return;
+    }
+    
+    console.log('Using backend cart API');
+    try {
+      await addToCartMutation.mutateAsync({ productId: product._id, quantity });
+      console.log('✅ Successfully added to backend cart');
+    } catch (error) {
+      console.error('❌ Backend cart failed:', error);
+      alert('Failed to add item to cart. Please try again.');
     }
   };
 
