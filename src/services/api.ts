@@ -113,3 +113,18 @@ export const adminProductsAPI = {
   // Delete product
   deleteProduct: (productId: string) => apiClient.delete(`/admin/products/${productId}`),
 };
+
+// Admin Categories API
+export const adminCategoriesAPI = {
+  // Get all categories
+  getAllCategories: () => apiClient.get('/admin/categories'),
+  
+  // Create category
+  createCategory: (categoryData: any) => apiClient.post('/admin/categories', categoryData),
+  
+  // Update category
+  updateCategory: (categoryId: string, categoryData: any) => apiClient.put(`/admin/categories/${categoryId}`, categoryData),
+  
+  // Delete category
+  deleteCategory: (categoryId: string) => apiClient.delete(`/admin/categories/${categoryId}`),
+};

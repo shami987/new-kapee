@@ -1,11 +1,13 @@
 import { AdminLayout } from '../components';
 import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getCategories } from '../../services/categoryService';
+import { adminCategoriesAPI } from '../../services/api';
 import type { Category } from '../../types';
 
 export const CategoriesPage = () => {
+  const queryClient = useQueryClient();
   const [editingCategory, setEditingCategory] = useState<any>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,6 +21,44 @@ export const CategoriesPage = () => {
     },
   });
 
+  // Create category mutation
+  const createCategoryMutation = useMutation({
+    mutationFn: (categoryData: any) => adminCategoriesAPI.createCategory(categoryData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
+      setShowAddForm(false);
+      alert('Category created successfully!');
+    },
+    onError: (error: any) => {
+      alert(`Failed to create category: ${error.response?.data?.message || error.message}`);
+    },
+  });
+
+  // Update category mutation
+  const updateCategoryMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string, data: any }) => adminCategoriesAPI.updateCategory(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
+      setEditingCategory(null);
+      alert('Category updated successfully!');
+    },
+    onError: (error: any) => {
+      alert(`Failed to update category: ${error.response?.data?.message || error.message}`);
+    },
+  });
+
+  // Delete category mutation
+  const deleteCategoryMutation = useMutation({
+    mutationFn: (categoryId: string) => adminCategoriesAPI.deleteCategory(categoryId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
+      alert('Category deleted successfully!');
+    },
+    onError: (error: any) => {
+      alert(`Failed to delete category: ${error.response?.data?.message || error.message}`);
+    },
+  });
+
   const handleEdit = (category: Category) => {
     if (window.confirm(`Are you sure you want to edit "${category.name}"?`)) {
       setEditingCategory(category);
@@ -27,20 +67,15 @@ export const CategoriesPage = () => {
 
   const handleDelete = (category: Category) => {
     if (window.confirm(`Are you sure you want to delete "${category.name}"?\n\nThis action cannot be undone.`)) {
-      // TODO: Add delete mutation when backend API is ready
-      console.log('Delete category:', category.id);
+      deleteCategoryMutation.mutate(category._id || category.id.toString());
     }
   };
 
   const handleSave = (categoryData: any) => {
     if (editingCategory) {
-      // TODO: Add update mutation when backend API is ready
-      console.log('Update category:', categoryData);
-      setEditingCategory(null);
+      updateCategoryMutation.mutate({ id: editingCategory._id || editingCategory.id.toString(), data: categoryData });
     } else {
-      // TODO: Add create mutation when backend API is ready
-      console.log('Create category:', categoryData);
-      setShowAddForm(false);
+      createCategoryMutation.mutate(categoryData);
     }
   };
 
