@@ -8,6 +8,7 @@ import { ProductShowcase } from './components/ProductShowcase';
 import WomenShowcase from './components/WomenShowcase';
 import PopularFashion from './components/PopularFashion';
 import FashionCategories from './components/FashionCategories';
+import { ProductTabs } from './components/ProductTabs';
 import { ProductCard } from './components/ProductCard';
 import { CartSidebar } from './components/CartSidebar';
 import { ProductFilters } from './components/ProductFilters';
@@ -136,35 +137,8 @@ function App() {
         
         <FashionCategories categories={categories} />
         
-        <section className="py-16" data-products-section>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-center mb-12">
-              {searchQuery ? `Search Results for "${searchQuery}"` : 'All Products'}
-            </h2>
-            
-            <ProductFilters
-              categories={uniqueCategories}
-              onFilterChange={setFilters}
-            />
-            
-            {filteredProducts.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-500 text-lg">No products found matching your criteria.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredProducts.map((product) => (
-                  <ProductCard
-                    key={product._id}
-                    product={product}
-                    onAddToCart={addToCart}
-                    onLoginRequired={() => setIsLoginModalOpen(true)}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
+        {/* Product Tabs Section */}
+        <ProductTabs />
       </main>
 
       <footer className="bg-gray-900 text-white py-12">
