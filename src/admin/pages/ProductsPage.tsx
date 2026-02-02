@@ -10,6 +10,7 @@ export const ProductsPage = () => {
   const queryClient = useQueryClient();
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch products from backend
   const { data: productsData, isLoading } = useQuery({
@@ -54,11 +55,13 @@ export const ProductsPage = () => {
   });
 
   const handleEdit = (product: any) => {
-    setEditingProduct(product);
+    if (window.confirm(`Are you sure you want to edit "${product.name}"?`)) {
+      setEditingProduct(product);
+    }
   };
 
   const handleDelete = (product: any) => {
-    if (window.confirm(`Are you sure you want to delete "${product.name}"?`)) {
+    if (window.confirm(`Are you sure you want to delete "${product.name}"?\n\nThis action cannot be undone.`)) {
       deleteProductMutation.mutate(product._id);
     }
   };
@@ -83,6 +86,16 @@ export const ProductsPage = () => {
     return 'Active';
   };
 
+  // Filter products based on search query
+  const filteredProducts = productsData?.filter((product: any) => {
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      product.name.toLowerCase().includes(searchLower) ||
+      product.description?.toLowerCase().includes(searchLower) ||
+      product.category?.name?.toLowerCase().includes(searchLower)
+    );
+  }) || [];
+
   if (isLoading) {
     return (
       <AdminLayout title="Products">
@@ -104,6 +117,8 @@ export const ProductsPage = () => {
               <input
                 type="text"
                 placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -131,7 +146,7 @@ export const ProductsPage = () => {
               </tr>
             </thead>
             <tbody>
-              {productsData?.map((product: any) => (
+              {filteredProducts.map((product: any) => (
                 <tr key={product._id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                   <td className="py-4 px-6 font-medium text-gray-900">{product.name}</td>
                   <td className="py-4 px-6 text-gray-600">{product.category?.name || 'No Category'}</td>
@@ -169,7 +184,7 @@ export const ProductsPage = () => {
 
         {/* Pagination */}
         <div className="flex items-center justify-between p-6 border-t border-gray-200">
-          <p className="text-sm text-gray-600">Showing 1 to {productsData?.length || 0} of {productsData?.length || 0} products</p>
+          <p className="text-sm text-gray-600">Showing 1 to {filteredProducts.length} of {filteredProducts.length} products{searchQuery && ` (filtered from ${productsData?.length || 0} total)`}</p>
           <div className="flex gap-2">
             <button className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Previous</button>
             <button className="px-3 py-2 bg-blue-600 text-white rounded-lg">1</button>

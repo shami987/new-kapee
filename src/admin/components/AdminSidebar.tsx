@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { BarChart3, Package, Users, ShoppingCart, Settings, LogOut, ShoppingBag } from 'lucide-react';
+import { BarChart3, Package, Users, ShoppingCart, Settings, LogOut, ShoppingBag, Grid3X3 } from 'lucide-react';
 
 export const AdminSidebar = () => {
   const navigate = useNavigate();
@@ -9,6 +9,7 @@ export const AdminSidebar = () => {
     { label: 'Dashboard', path: '/admin', icon: BarChart3 },
     { label: 'Orders', path: '/admin/orders', icon: ShoppingCart },
     { label: 'Products', path: '/admin/products', icon: Package },
+    { label: 'Categories', path: '/admin/categories', icon: Grid3X3 },
     { label: 'Cart Management', path: '/admin/carts', icon: ShoppingBag },
     { label: 'Customers', path: '/admin/customers', icon: Users },
     { label: 'Settings', path: '/admin/settings', icon: Settings },
