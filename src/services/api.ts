@@ -98,3 +98,18 @@ export const adminCartAPI = {
   // Clear all abandoned carts
   clearAbandonedCarts: () => apiClient.delete('/admin/carts/abandoned'),
 };
+
+// Admin Products API
+export const adminProductsAPI = {
+  // Get all products
+  getAllProducts: () => apiClient.get('/admin/products'),
+  
+  // Create product
+  createProduct: (productData: any) => apiClient.post('/admin/products', productData),
+  
+  // Update product
+  updateProduct: (productId: string, productData: any) => apiClient.put(`/admin/products/${productId}`, productData),
+  
+  // Delete product
+  deleteProduct: (productId: string) => apiClient.delete(`/admin/products/${productId}`),
+};

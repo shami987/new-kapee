@@ -21,6 +21,7 @@ export interface CartItem extends Product {
 
 export interface Category {
   id: number;
+  _id?: string; // MongoDB ObjectId
   name: string;
   image: string;
   productCount: number;

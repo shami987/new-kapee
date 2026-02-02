@@ -1,54 +1,97 @@
 import { AdminLayout } from '../components';
 import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { adminProductsAPI } from '../../services/api';
+import { getCategories } from '../../services/categoryService';
+import type { Category } from '../../types';
 
 export const ProductsPage = () => {
-  const [products, setProducts] = useState([
-    { id: 1, name: 'Wireless Earbuds', category: 'Electronics', price: '$99.99', stock: 45, status: 'Active' },
-    { id: 2, name: 'Phone Case Pro', category: 'Accessories', price: '$25.99', stock: 120, status: 'Active' },
-    { id: 3, name: 'USB-C Hub', category: 'Electronics', price: '$49.99', stock: 8, status: 'Low Stock' },
-    { id: 4, name: 'Screen Protector', category: 'Accessories', price: '$14.99', stock: 0, status: 'Out of Stock' },
-  ]);
-
+  const queryClient = useQueryClient();
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+
+  // Fetch products from backend
+  const { data: productsData, isLoading } = useQuery({
+    queryKey: ['admin-products'],
+    queryFn: async () => {
+      const response = await adminProductsAPI.getAllProducts();
+      return response.data.products || [];
+    },
+  });
+
+  // Create product mutation
+  const createProductMutation = useMutation({
+    mutationFn: (productData: any) => {
+      console.log('Sending product data:', productData);
+      return adminProductsAPI.createProduct(productData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      setShowAddForm(false);
+    },
+    onError: (error: any) => {
+      console.error('Create product error:', error.response?.data);
+      alert(`Failed to create product: ${error.response?.data?.message || error.message}`);
+    },
+  });
+
+  // Update product mutation
+  const updateProductMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string, data: any }) => adminProductsAPI.updateProduct(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+      setEditingProduct(null);
+    },
+  });
+
+  // Delete product mutation
+  const deleteProductMutation = useMutation({
+    mutationFn: (productId: string) => adminProductsAPI.deleteProduct(productId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-products'] });
+    },
+  });
 
   const handleEdit = (product: any) => {
     setEditingProduct(product);
   };
 
-  const handleDelete = (productId: number) => {
-    const product = products.find(p => p.id === productId);
-    if (window.confirm(`Are you sure you want to delete "${product?.name}"?`)) {
-      setProducts(products.filter(p => p.id !== productId));
+  const handleDelete = (product: any) => {
+    if (window.confirm(`Are you sure you want to delete "${product.name}"?`)) {
+      deleteProductMutation.mutate(product._id);
     }
   };
 
   const handleSave = (productData: any) => {
     if (editingProduct) {
-      // Update existing product
-      setProducts(products.map(p => p.id === editingProduct.id ? { ...p, ...productData } : p));
-      setEditingProduct(null);
+      updateProductMutation.mutate({ id: editingProduct._id, data: productData });
     } else {
-      // Add new product
-      const newProduct = { ...productData, id: Date.now() };
-      setProducts([...products, newProduct]);
-      setShowAddForm(false);
+      createProductMutation.mutate(productData);
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Active':
-        return 'bg-green-100 text-green-800';
-      case 'Low Stock':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'Out of Stock':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+  const getStatusColor = (inStock: boolean, quantity: number) => {
+    if (!inStock || quantity === 0) return 'bg-red-100 text-red-800';
+    if (quantity < 10) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-green-100 text-green-800';
   };
+
+  const getStatusText = (inStock: boolean, quantity: number) => {
+    if (!inStock || quantity === 0) return 'Out of Stock';
+    if (quantity < 10) return 'Low Stock';
+    return 'Active';
+  };
+
+  if (isLoading) {
+    return (
+      <AdminLayout title="Products">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-gray-600">Loading products...</div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout title="Products">
@@ -88,15 +131,15 @@ export const ProductsPage = () => {
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => (
-                <tr key={product.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
+              {productsData?.map((product: any) => (
+                <tr key={product._id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                   <td className="py-4 px-6 font-medium text-gray-900">{product.name}</td>
-                  <td className="py-4 px-6 text-gray-600">{product.category}</td>
-                  <td className="py-4 px-6 font-bold text-gray-900">{product.price}</td>
-                  <td className="py-4 px-6 text-gray-600">{product.stock} units</td>
+                  <td className="py-4 px-6 text-gray-600">{product.category?.name || 'No Category'}</td>
+                  <td className="py-4 px-6 font-bold text-gray-900">${product.price}</td>
+                  <td className="py-4 px-6 text-gray-600">{product.quantity} units</td>
                   <td className="py-4 px-6">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(product.status)}`}>
-                      {product.status}
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(product.inStock, product.quantity)}`}>
+                      {getStatusText(product.inStock, product.quantity)}
                     </span>
                   </td>
                   <td className="py-4 px-6">
@@ -111,7 +154,7 @@ export const ProductsPage = () => {
                         <Edit size={18} />
                       </button>
                       <button 
-                        onClick={() => handleDelete(product.id)}
+                        onClick={() => handleDelete(product)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
                       >
                         <Trash2 size={18} />
@@ -126,7 +169,7 @@ export const ProductsPage = () => {
 
         {/* Pagination */}
         <div className="flex items-center justify-between p-6 border-t border-gray-200">
-          <p className="text-sm text-gray-600">Showing 1 to {products.length} of {products.length} products</p>
+          <p className="text-sm text-gray-600">Showing 1 to {productsData?.length || 0} of {productsData?.length || 0} products</p>
           <div className="flex gap-2">
             <button className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Previous</button>
             <button className="px-3 py-2 bg-blue-600 text-white rounded-lg">1</button>
@@ -154,22 +197,47 @@ export const ProductsPage = () => {
 
 // Product Modal Component
 const ProductModal = ({ product, onSave, onClose }: { product: any, onSave: (data: any) => void, onClose: () => void }) => {
+  const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
     name: product?.name || '',
-    category: product?.category || '',
+    description: product?.description || '',
     price: product?.price || '',
-    stock: product?.stock || 0,
-    status: product?.status || 'Active'
+    quantity: product?.quantity || 0,
+    inStock: product?.inStock ?? true,
+    categoryId: product?.category?._id || '',
+    image: product?.image || ''
   });
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    getCategories()
+      .then(setCategories)
+      .catch(console.error);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formData);
+    
+    // Validate required fields
+    if (!formData.name || !formData.price || !formData.quantity || !formData.categoryId) {
+      alert('Please fill in all required fields (Name, Category, Price, Quantity)');
+      return;
+    }
+    
+    // Convert string values to numbers for backend
+    const submitData = {
+      ...formData,
+      price: parseFloat(formData.price as string),
+      quantity: parseInt(formData.quantity as string)
+    };
+    
+    console.log('Form data being submitted:', submitData);
+    onSave(submitData);
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
+      <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-bold mb-4">{product ? 'Edit Product' : 'Add Product'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -183,51 +251,71 @@ const ProductModal = ({ product, onSave, onClose }: { product: any, onSave: (dat
             />
           </div>
           <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">Description</label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              className="w-full p-2 border rounded-lg"
+              rows={3}
+            />
+          </div>
+          <div className="mb-4">
             <label className="block text-sm font-medium mb-2">Category</label>
             <select
-              value={formData.category}
-              onChange={(e) => setFormData({...formData, category: e.target.value})}
+              value={formData.categoryId}
+              onChange={(e) => setFormData({...formData, categoryId: e.target.value})}
               className="w-full p-2 border rounded-lg"
               required
             >
               <option value="">Select Category</option>
-              <option value="Electronics">Electronics</option>
-              <option value="Accessories">Accessories</option>
-              <option value="Clothing">Clothing</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category._id || category.id}>
+                  {category.name}
+                </option>
+              ))}
             </select>
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">Image URL</label>
+            <input
+              type="url"
+              value={formData.image}
+              onChange={(e) => setFormData({...formData, image: e.target.value})}
+              className="w-full p-2 border rounded-lg"
+              placeholder="https://example.com/image.jpg"
+            />
           </div>
           <div className="mb-4">
             <label className="block text-sm font-medium mb-2">Price</label>
             <input
-              type="text"
+              type="number"
+              step="0.01"
               value={formData.price}
               onChange={(e) => setFormData({...formData, price: e.target.value})}
               className="w-full p-2 border rounded-lg"
-              placeholder="$0.00"
               required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">Stock</label>
+            <label className="block text-sm font-medium mb-2">Quantity</label>
             <input
               type="number"
-              value={formData.stock}
-              onChange={(e) => setFormData({...formData, stock: parseInt(e.target.value)})}
+              value={formData.quantity}
+              onChange={(e) => setFormData({...formData, quantity: e.target.value})}
               className="w-full p-2 border rounded-lg"
               required
             />
           </div>
           <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">Status</label>
-            <select
-              value={formData.status}
-              onChange={(e) => setFormData({...formData, status: e.target.value})}
-              className="w-full p-2 border rounded-lg"
-            >
-              <option value="Active">Active</option>
-              <option value="Low Stock">Low Stock</option>
-              <option value="Out of Stock">Out of Stock</option>
-            </select>
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                checked={formData.inStock}
+                onChange={(e) => setFormData({...formData, inStock: e.target.checked})}
+                className="mr-2"
+              />
+              In Stock
+            </label>
           </div>
           <div className="flex gap-2">
             <button
