@@ -21,6 +21,7 @@ export const useOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [stats, setStats] = useState<OrderStats>({
     total: 0,
     pending: 0,
@@ -97,12 +98,14 @@ export const useOrders = () => {
     }
   }, [orders, calculateStats]);
 
-  const filterOrders = useCallback((filters: OrderFilters, searchQuery: string = '') => {
+  const filterOrders = useCallback((filters: OrderFilters, query: string = '') => {
+    const searchTerm = query || searchQuery;
     return orders.filter(order => {
-      const matchesSearch = !searchQuery || 
-        order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.shippingAddress?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.items.some(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesSearch = !searchTerm || 
+        order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (order.shippingAddress?.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        order.items.some(item => item.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        order.status.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesStatus = !filters.status || order.status === filters.status;
       const orderDate = new Date(order.createdAt);
@@ -111,7 +114,7 @@ export const useOrders = () => {
 
       return matchesSearch && matchesStatus && matchesDateFrom && matchesDateTo;
     });
-  }, [orders]);
+  }, [orders, searchQuery]);
 
   useEffect(() => {
     fetchOrders();
@@ -122,6 +125,8 @@ export const useOrders = () => {
     loading,
     error,
     stats,
+    searchQuery,
+    setSearchQuery,
     fetchOrders,
     updateOrder,
     updateOrderStatus,

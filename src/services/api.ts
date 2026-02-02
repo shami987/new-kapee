@@ -146,3 +146,21 @@ export const adminOrdersAPI = {
   // Delete order
   deleteOrder: (orderId: string) => apiClient.delete(`/admin/orders/${orderId}`),
 };
+
+// Admin Dashboard API
+export const adminDashboardAPI = {
+  // Get dashboard statistics
+  getStats: () => apiClient.get('/admin/dashboard/stats'),
+  
+  // Get revenue data for charts
+  getRevenueData: () => apiClient.get('/admin/dashboard/revenue'),
+  
+  // Get top products
+  getTopProducts: () => apiClient.get('/admin/dashboard/top-products'),
+  
+  // Get recent orders
+  getRecentOrders: () => apiClient.get('/admin/dashboard/recent-orders'),
+  
+  // Get analytics data
+  getAnalytics: () => apiClient.get('/admin/dashboard/analytics'),
+};

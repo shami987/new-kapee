@@ -10,7 +10,6 @@ export const OrdersPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<any>({});
-  const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({});
   const itemsPerPage = 10;
@@ -20,6 +19,8 @@ export const OrdersPage = () => {
     loading,
     error,
     stats,
+    searchQuery,
+    setSearchQuery,
     fetchOrders,
     updateOrder,
     deleteOrder,
@@ -27,7 +28,7 @@ export const OrdersPage = () => {
   } = useOrders();
 
   // Apply filters and search to get filtered orders
-  const filteredOrders = filterOrders(filters, searchQuery);
+  const filteredOrders = filterOrders(filters);
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
@@ -186,8 +187,8 @@ export const OrdersPage = () => {
 
           <div className="bg-white rounded-lg border border-gray-200">
             {/* Header with search and refresh functionality */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <div className="flex-1 max-w-md">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 border-b border-gray-200 gap-4">
+              <div className="flex-1 w-full sm:max-w-md">
                 <div className="relative">
                   <Search className="absolute left-3 top-3 text-gray-400" size={18} />
                   <input
@@ -199,35 +200,35 @@ export const OrdersPage = () => {
                   />
                 </div>
               </div>
-              <div className="flex gap-2 ml-4">
+              <div className="flex gap-2 w-full sm:w-auto">
                 {/* Refresh button to reload data from API */}
                 <button 
                   onClick={handleRefresh}
-                  className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex-1 sm:flex-none"
                   disabled={loading}
                 >
                   <RefreshCw className={`${loading ? 'animate-spin' : ''}`} size={18} />
-                  Refresh
+                  <span className="hidden sm:inline">Refresh</span>
                 </button>
-                <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                <button className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex-1 sm:flex-none">
                   <Plus size={18} />
-                  New Order
+                  <span className="hidden sm:inline">New Order</span>
                 </button>
               </div>
             </div>
 
             {/* Orders Table - now displaying real API data */}
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[800px]">
                 <thead>
                   <tr className="border-b border-gray-200 bg-gray-50">
-                    <th className="text-left py-4 px-6 font-semibold text-gray-700">Order ID</th>
-                    <th className="text-left py-4 px-6 font-semibold text-gray-700">Customer</th>
-                    <th className="text-left py-4 px-6 font-semibold text-gray-700">Items</th>
-                    <th className="text-left py-4 px-6 font-semibold text-gray-700">Total</th>
-                    <th className="text-left py-4 px-6 font-semibold text-gray-700">Status</th>
-                    <th className="text-left py-4 px-6 font-semibold text-gray-700">Date</th>
-                    <th className="text-left py-4 px-6 font-semibold text-gray-700">Actions</th>
+                    <th className="text-left py-4 px-3 sm:px-6 font-semibold text-gray-700 text-sm">Order ID</th>
+                    <th className="text-left py-4 px-3 sm:px-6 font-semibold text-gray-700 text-sm hidden sm:table-cell">Customer</th>
+                    <th className="text-left py-4 px-3 sm:px-6 font-semibold text-gray-700 text-sm">Items</th>
+                    <th className="text-left py-4 px-3 sm:px-6 font-semibold text-gray-700 text-sm">Total</th>
+                    <th className="text-left py-4 px-3 sm:px-6 font-semibold text-gray-700 text-sm">Status</th>
+                    <th className="text-left py-4 px-3 sm:px-6 font-semibold text-gray-700 text-sm hidden md:table-cell">Date</th>
+                    <th className="text-left py-4 px-3 sm:px-6 font-semibold text-gray-700 text-sm">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -236,10 +237,10 @@ export const OrdersPage = () => {
                     
                     return (
                       <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                        <td className="py-4 px-6">
-                          <span className="font-mono text-sm font-medium text-blue-600">#{order._id || order.id}</span>
+                        <td className="py-4 px-3 sm:px-6">
+                          <span className="font-mono text-xs sm:text-sm font-medium text-blue-600">#{(order._id || order.id).slice(-8)}</span>
                         </td>
-                        <td className="py-4 px-6">
+                        <td className="py-4 px-3 sm:px-6 hidden sm:table-cell">
                           {isEditing ? (
                             <input
                               type="email"
@@ -250,7 +251,7 @@ export const OrdersPage = () => {
                             />
                           ) : (
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gray-200 rounded-full flex items-center justify-center">
                                 <span className="text-xs font-medium text-gray-600">
                                   {order.user?.email ? 
                                     order.user.email.charAt(0).toUpperCase() : 
@@ -258,16 +259,16 @@ export const OrdersPage = () => {
                                   }
                                 </span>
                               </div>
-                              <span className="font-medium text-gray-900">
+                              <span className="font-medium text-gray-900 text-sm truncate max-w-32">
                                 {order.user?.email || 'Guest User'}
                               </span>
                             </div>
                           )}
                         </td>
-                        <td className="py-4 px-6 text-gray-600">
+                        <td className="py-4 px-3 sm:px-6 text-gray-600 text-sm">
                           {order.items.length} item{order.items.length !== 1 ? 's' : ''}
                         </td>
-                        <td className="py-4 px-6">
+                        <td className="py-4 px-3 sm:px-6">
                           {isEditing ? (
                             <input
                               type="number"
@@ -277,15 +278,15 @@ export const OrdersPage = () => {
                               className="w-20 p-1 border rounded text-sm"
                             />
                           ) : (
-                            <span className="font-bold text-gray-900">{formatCurrency(order.total || 0)}</span>
+                            <span className="font-bold text-gray-900 text-sm">{formatCurrency(order.total || 0)}</span>
                           )}
                         </td>
-                        <td className="py-4 px-6">
+                        <td className="py-4 px-3 sm:px-6">
                           {isEditing ? (
                             <select
                               value={editFormData.status}
                               onChange={(e) => setEditFormData({...editFormData, status: e.target.value})}
-                              className="p-1 border rounded text-sm"
+                              className="p-1 border rounded text-xs"
                             >
                               <option value="pending">Pending</option>
                               <option value="paid">Paid</option>
@@ -294,26 +295,26 @@ export const OrdersPage = () => {
                               <option value="cancelled">Cancelled</option>
                             </select>
                           ) : (
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
                               {getStatusText(order.status)}
                             </span>
                           )}
                         </td>
-                        <td className="py-4 px-6 text-gray-600">
+                        <td className="py-4 px-3 sm:px-6 text-gray-600 text-sm hidden md:table-cell">
                           {formatDate(order.createdAt)}
                         </td>
-                        <td className="py-4 px-6">
+                        <td className="py-4 px-3 sm:px-6">
                           {isEditing ? (
                             <div className="flex gap-1">
                               <button
                                 onClick={() => handleUpdateOrder(order._id || order.id)}
-                                className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+                                className="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700"
                               >
-                                Update
+                                Save
                               </button>
                               <button
                                 onClick={handleCancelEdit}
-                                className="px-3 py-1 bg-gray-300 text-gray-700 rounded text-sm hover:bg-gray-400"
+                                className="px-2 py-1 bg-gray-300 text-gray-700 rounded text-xs hover:bg-gray-400"
                               >
                                 Cancel
                               </button>
@@ -322,27 +323,24 @@ export const OrdersPage = () => {
                             <div className="flex gap-1">
                               <button
                                 onClick={() => handleViewOrder(order)}
-                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                className="p-1.5 sm:p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                 title="View Details"
                               >
-                                <Eye size={16} />
+                                <Eye size={14} className="sm:w-4 sm:h-4" />
                               </button>
                               <button 
                                 onClick={() => handleEditOrder(order)}
-                                className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors" 
+                                className="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors" 
                                 title="Edit"
                               >
-                                <Edit size={16} />
+                                <Edit size={14} className="sm:w-4 sm:h-4" />
                               </button>
                               <button 
                                 onClick={() => handleDeleteOrder(order)}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" 
+                                className="p-1.5 sm:p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" 
                                 title="Delete"
                               >
-                                <Trash2 size={16} />
-                              </button>
-                              <button className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors" title="More">
-                                <MoreVertical size={16} />
+                                <Trash2 size={14} className="sm:w-4 sm:h-4" />
                               </button>
                             </div>
                           )}
@@ -355,35 +353,39 @@ export const OrdersPage = () => {
             </div>
 
             {/* Pagination - updated to show real data counts */}
-            <div className="flex items-center justify-between p-6 border-t border-gray-200">
-              <p className="text-sm text-gray-600">
+            <div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 border-t border-gray-200 gap-4">
+              <p className="text-sm text-gray-600 text-center sm:text-left">
                 Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredOrders.length)} of {filteredOrders.length} results
               </p>
-              <div className="flex gap-2">
+              <div className="flex gap-1 sm:gap-2 flex-wrap justify-center">
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
-                  Previous
+                  Prev
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`px-3 py-2 rounded-lg transition-colors ${
-                      currentPage === page
-                        ? 'bg-blue-600 text-white'
-                        : 'border border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                  const page = i + Math.max(1, currentPage - 2);
+                  if (page > totalPages) return null;
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-2 sm:px-3 py-2 rounded-lg transition-colors text-sm ${
+                        currentPage === page
+                          ? 'bg-blue-600 text-white'
+                          : 'border border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
                   Next
                 </button>
