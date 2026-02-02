@@ -87,53 +87,14 @@ export const ordersAPI = {
 // Admin Cart Management API
 export const adminCartAPI = {
   // Get all carts with populated user data
-  getAllCarts: () => {
-    try {
-      return apiClient.get('/admin/carts?populate=user');
-    } catch (error) {
-      console.error('Error fetching carts:', error);
-      // Return mock data if backend is not available
-      return Promise.resolve({
-        data: [
-          {
-            _id: '697e5d857495ad6d92ca9b08863',
-            userId: '697a76743296962ca9b08863',
-            user: {
-              name: 'John Doe',
-              email: 'john@example.com'
-            },
-            items: [
-              {
-                product: {
-                  _id: '1',
-                  name: 'Men wallet',
-                  price: 25.00,
-                  image: '/images/wallet.jpg'
-                },
-                quantity: 4
-              }
-            ],
-            createdAt: '2026-02-02T01:00:00Z',
-            updatedAt: '2026-02-02T01:00:00Z'
-          }
-        ]
-      });
-    }
-  },
+  getAllCarts: () => apiClient.get('/admin/carts'),
   
   // Get cart by user ID
   getCartByUserId: (userId: string) => apiClient.get(`/admin/carts/user/${userId}`),
   
   // Delete cart
-  deleteCart: (cartId: string) => {
-    console.log('Deleting cart:', cartId);
-    // For now, return a successful response
-    return Promise.resolve({ data: { success: true, message: 'Cart deleted successfully' } });
-  },
+  deleteCart: (cartId: string) => apiClient.delete(`/admin/carts/${cartId}`),
   
   // Clear all abandoned carts
-  clearAbandonedCarts: () => {
-    console.log('Clearing abandoned carts');
-    return Promise.resolve({ data: { success: true, message: 'Abandoned carts cleared' } });
-  },
+  clearAbandonedCarts: () => apiClient.delete('/admin/carts/abandoned'),
 };
