@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { adminOrdersAPI } from '../services/adminApi';
+import { adminOrdersAPI } from '../../services/api';
 import type { Order } from '../../types';
 
 interface OrderStats {

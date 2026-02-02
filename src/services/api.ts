@@ -128,3 +128,18 @@ export const adminCategoriesAPI = {
   // Delete category
   deleteCategory: (categoryId: string) => apiClient.delete(`/admin/categories/${categoryId}`),
 };
+
+// Admin Orders API
+export const adminOrdersAPI = {
+  // Get all orders
+  getOrders: () => apiClient.get('/admin/orders'),
+  
+  // Get specific order
+  getOrder: (orderId: string) => apiClient.get(`/admin/orders/${orderId}`),
+  
+  // Update order status
+  updateOrderStatus: (orderId: string, status: string) => apiClient.put(`/admin/orders/${orderId}`, { status }),
+  
+  // Delete order
+  deleteOrder: (orderId: string) => apiClient.delete(`/admin/orders/${orderId}`),
+};

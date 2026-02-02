@@ -195,20 +195,20 @@ export const OrdersPage = () => {
                   {paginatedOrders.map((order) => (
                     <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                       <td className="py-4 px-6">
-                        <span className="font-mono text-sm font-medium text-blue-600">#{order.id}</span>
+                        <span className="font-mono text-sm font-medium text-blue-600">#{order._id || order.id}</span>
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
                             <span className="text-xs font-medium text-gray-600">
-                              {order.shippingAddress?.name ? 
-                                order.shippingAddress.name.split(' ').map(n => n[0]).join('') : 
+                              {order.user?.email ? 
+                                order.user.email.charAt(0).toUpperCase() : 
                                 'U'
                               }
                             </span>
                           </div>
                           <span className="font-medium text-gray-900">
-                            {order.shippingAddress?.name || 'Unknown Customer'}
+                            {order.user?.email || 'Guest User'}
                           </span>
                         </div>
                       </td>
