@@ -36,7 +36,9 @@ export interface OrderItem {
 
 export interface Order {
   id: string;
+  _id?: string;
   userId?: number;
+  user?: { email: string };
   items: OrderItem[];
   subtotal: number;
   shipping: number;

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Header } from './components/Header';
 import { StickyNav } from './components/StickyNav';
 import { HeroBanner } from './components/HeroBanner';
@@ -9,14 +9,14 @@ import WomenShowcase from './components/WomenShowcase';
 import PopularFashion from './components/PopularFashion';
 import FashionCategories from './components/FashionCategories';
 import { ProductTabs } from './components/ProductTabs';
-import { ProductCard } from './components/ProductCard';
 import { CartSidebar } from './components/CartSidebar';
-import { ProductFilters } from './components/ProductFilters';
 import { SignupModal } from './components/SignupModal';
 import { LoginModal } from './components/LoginModal';
 import { useCart } from './hooks/useCart';
 import { useAuth } from './contexts/AuthContext';
-import { products, categories } from './data/products';
+import { useQuery } from '@tanstack/react-query';
+import { getAllProducts } from './services/productService';
+import { categories } from './data/products';
 
 const footerLinks = {
   quickLinks: [
@@ -38,15 +38,8 @@ const footerLinks = {
 
 function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
-  // Add login modal state
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [filters, setFilters] = useState({
-    category: '',
-    priceRange: [0, 1000] as [number, number],
-    sortBy: 'name'
-  });
   
   const {
     cartItems,
@@ -60,43 +53,29 @@ function App() {
 
   const { isLoggedIn } = useAuth();
 
-  const filteredProducts = useMemo(() => {
-    let filtered = products.filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           product.category.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = !filters.category || product.category === filters.category;
-      const matchesPrice = product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1];
-      
-      return matchesSearch && matchesCategory && matchesPrice;
-    });
+  // Fetch products from backend
+  const { data: products = [], isLoading: productsLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: getAllProducts,
+  });
 
-    // Sort products
-    filtered.sort((a, b) => {
-      switch (filters.sortBy) {
-        case 'price-low':
-          return a.price - b.price;
-        case 'price-high':
-          return b.price - a.price;
-        case 'rating':
-          return b.rating - a.rating;
-        default:
-          return a.name.localeCompare(b.name);
-      }
-    });
-
-    return filtered;
-  }, [searchQuery, filters]);
-
-  const uniqueCategories = useMemo(() => 
-    Array.from(new Set(products.map(p => p.category))), [products]
-  );
+  if (productsLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
       <Header
         cartItemsCount={getTotalItems}
         onCartClick={() => setIsCartOpen(true)}
-        onSearch={setSearchQuery}
+        onSearch={() => {}}
       />
       
       <StickyNav

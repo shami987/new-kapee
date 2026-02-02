@@ -7,8 +7,7 @@ import { Header } from '../components/Header';
 import { CartSidebar } from '../components/CartSidebar';
 import { useCart } from '../hooks/useCart';
 import { useAuth } from '../contexts/AuthContext';
-import { getProductById } from '../services/productService';
-import { products as localProducts } from '../data/products';
+import { getAllProducts } from '../services/productService';
 
 
 
@@ -30,14 +29,13 @@ export const ProductDetailPage = () => {
 
   const { isLoggedIn } = useAuth();
 
-  const { data: fetchedProduct, isLoading } = useQuery({
-    queryKey: ['product', id],
-    queryFn: () => getProductById(id!),
-    enabled: !!id,
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: getAllProducts,
   });
 
-  // Fallback to local products if API fails
-  const product = fetchedProduct || localProducts.find(p => p._id === id);
+  // Find the specific product by ID
+  const product = products.find(p => (p._id || p.id) === id);
 
   console.log('Product data:', product); // Debug log
 

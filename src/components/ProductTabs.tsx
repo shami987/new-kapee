@@ -1,117 +1,6 @@
-import { useState } from 'react';
-
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  rating: number;
-  image: string;
-}
-
-const productData = {
-  RECENT: [
-    {
-      id: '1',
-      name: 'Men Hooded Navy Blue & Gr...',
-      price: 70.00,
-      originalPrice: 95.00,
-      rating: 5,
-      image: 'https://kapee.presslayouts.com/wp-content/uploads/2019/04/Solid-Men-Hooded-Blue-Grey-T-Shirt-5.jpg'
-    },
-    {
-      id: '2',
-      name: 'Navy Blue-Silver-White Multi...',
-      price: 49.00,
-      originalPrice: 85.00,
-      rating: 4,
-      image: 'https://kapee.presslayouts.com/wp-content/uploads/2019/04/Navy-BlueSilver-White-Multifunction-Analog-Watch.jpg'
-    },
-    {
-      id: '3',
-      name: 'Women Off White Printed Bl...',
-      price: 47.00,
-      rating: 2.7,
-      image: 'https://kapee.presslayouts.com/wp-content/uploads/2019/04/Women-Off-White-Printed-Blouson-Top.jpg'
-    }
-  ],
-  FEATURED: [
-    {
-      id: '4',
-      name: 'Men Hooded Navy Blue & Gr...',
-      price: 70.00,
-      originalPrice: 95.00,
-      rating: 5,
-      image: 'https://kapee.presslayouts.com/wp-content/uploads/2019/04/Solid-Men-Hooded-Blue-Grey-T-Shirt-5.jpg'
-    },
-    {
-      id: '5',
-      name: 'Women Off White Printed Bl...',
-      price: 47.00,
-      rating: 2.7,
-      image: 'https://kapee.presslayouts.com/wp-content/uploads/2019/04/Women-Off-White-Printed-Blouson-Top.jpg'
-    },
-    {
-      id: '6',
-      name: 'Men Blue Skinny Fit Stretcha...',
-      price: 120.00,
-      rating: 2,
-      image: 'https://kapee.presslayouts.com/wp-content/uploads/2019/04/Men-Blue-Skinny-Fit-Stretchable-Jeans.jpg'
-    }
-  ],
-  'ON SALE': [
-    {
-      id: '7',
-      name: 'Men Hooded Navy Blue & Gr...',
-      price: 70.00,
-      originalPrice: 95.00,
-      rating: 5,
-      image: 'https://kapee.presslayouts.com/wp-content/uploads/2019/04/Solid-Men-Hooded-Blue-Grey-T-Shirt.jpg'
-    },
-    {
-      id: '8',
-      name: 'Navy Blue-Silver-White Multi...',
-      price: 49.00,
-      originalPrice: 85.00,
-      rating: 4,
-      image: 'https://kapee.presslayouts.com/wp-content/uploads/2019/04/Navy-BlueSilver-White-Multifunction-Analog-Watch.jpg'
-    },
-    {
-      id: '9',
-      name: 'Men Navy & Red Checked Sli...',
-      price: 99.00,
-      originalPrice: 124.00,
-      rating: 3.5,
-      image: 'https://kapee.presslayouts.com/wp-content/uploads/2019/04/Men-Navy-Red-Checked-Slim-Fit-Casual-Shirt.jpg'
-    }
-  ],
-  'TOP RATED': [
-    {
-      id: '10',
-      name: 'Men Hooded Navy Blue & Gr...',
-      price: 70.00,
-      originalPrice: 95.00,
-      rating: 5,
-      image: 'https://kapee.presslayouts.com/wp-content/uploads/2019/04/Solid-Men-Hooded-Blue-Grey-T-Shirt.jpg'
-    },
-    {
-      id: '11',
-      name: 'Men Navy & White Striped Sh...',
-      price: 49.00,
-      originalPrice: 54.00,
-      rating: 5,
-      image: 'https://kapee.presslayouts.com/wp-content/uploads/2019/06/Men-Navy-White-Striped-Shoes-1.jpg'
-    },
-    {
-      id: '12',
-      name: 'Women Blue Skinny Fit Stretc...',
-      price: 70.00,
-      originalPrice: 78.00,
-      rating: 5,
-      image: 'https://kapee.presslayouts.com/wp-content/uploads/2019/04/Women-Blue-Skinny-Fit-Stretchable-Jeans.jpg'
-    }
-  ]
-};
+import { useNavigate } from 'react-router-dom';
+import { getAllProducts } from '../services/productService';
+import { useQuery } from '@tanstack/react-query';
 
 const categories = [
   { letter: 'B', name: 'BEAUTY', tagline: 'BEAUTY TAGLINE' },
@@ -123,7 +12,22 @@ const categories = [
 ];
 
 export const ProductTabs = () => {
+  const navigate = useNavigate();
   const tabs = ['RECENT', 'FEATURED', 'ON SALE', 'TOP RATED'] as const;
+
+  // Fetch products from backend
+  const { data: backendProducts = [], isLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: getAllProducts,
+  });
+
+  // Organize products by category
+  const productData = {
+    RECENT: backendProducts.slice(0, 3),
+    FEATURED: backendProducts.filter((p: any) => p.isSale || p.isNew).slice(0, 3),
+    'ON SALE': backendProducts.filter((p: any) => p.isSale).slice(0, 3),
+    'TOP RATED': backendProducts.filter((p: any) => p.rating >= 4).slice(0, 3)
+  };
 
   const getRatingColor = (rating: number) => {
     if (rating >= 4.5) return 'bg-green-500';
@@ -146,13 +50,19 @@ export const ProductTabs = () => {
               
               {/* Products List */}
               <div className="space-y-4">
-                {productData[tab].map((product) => (
-                  <div key={product.id} className="flex items-start gap-3 hover:bg-gray-50 p-2 rounded transition-colors">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-16 h-16 object-cover rounded flex-shrink-0"
-                    />
+                {productData[tab].map((product: any) => (
+                  <div 
+                    key={product._id || product.id} 
+                    className="flex items-start gap-3 hover:bg-gray-50 p-2 rounded transition-colors cursor-pointer group"
+                    onClick={() => navigate(`/product/${product._id || product.id}`)}
+                  >
+                    <div className="relative overflow-hidden rounded flex-shrink-0">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-16 h-16 object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                    </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-medium text-gray-800 mb-2 line-clamp-2">
                         {product.name}

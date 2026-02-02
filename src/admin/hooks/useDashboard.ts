@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { adminOrdersAPI, adminCartAPI } from '../../services/api';
+import { adminOrdersAPI } from '../../services/api';
 
 interface DashboardStats {
   totalRevenue: number;
@@ -69,7 +69,7 @@ export const useDashboard = () => {
     };
   };
 
-  const generateRevenueData = (orders: any[]) => {
+  const generateRevenueData = () => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
     return months.map(month => ({
       month,
@@ -121,12 +121,12 @@ export const useDashboard = () => {
       const orders = ordersRes.data || [];
 
       setStats(calculateStatsFromOrders(orders));
-      setRevenueData(generateRevenueData(orders));
+      setRevenueData(generateRevenueData());
       setTopProducts(generateTopProducts(orders));
       setRecentOrders(formatRecentOrders(orders));
       setAnalytics({
         conversionRate: 3.2,
-        avgOrderValue: orders.length > 0 ? orders.reduce((sum, o) => sum + (o.total || 0), 0) / orders.length : 0,
+        avgOrderValue: orders.length > 0 ? orders.reduce((sum: number, o: any) => sum + (o.total || 0), 0) / orders.length : 0,
         customerRetention: 68.5,
         categoryBreakdown: [
           { name: 'Electronics', value: 45, color: '#3B82F6' },

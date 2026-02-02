@@ -1,5 +1,5 @@
 import { AdminLayout, OrderFilters, OrderDetailsModal, OrderStats, ErrorBoundary } from '../components';
-import { Search, Plus, Edit, Trash2, Eye, MoreVertical, RefreshCw, AlertCircle } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Eye, RefreshCw, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useOrders } from '../hooks/useOrders';
 import type { Order } from '../../types';
