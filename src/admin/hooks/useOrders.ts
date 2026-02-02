@@ -55,28 +55,32 @@ export const useOrders = () => {
     }
   }, [calculateStats]);
 
-  const updateOrderStatus = useCallback(async (orderId: string, newStatus: Order['status']) => {
+  const updateOrder = useCallback(async (orderId: string, orderData: any) => {
     try {
       setError(null);
-      await adminOrdersAPI.updateOrderStatus(orderId, newStatus);
+      await adminOrdersAPI.updateOrder(orderId, orderData);
       setOrders(prevOrders => 
         prevOrders.map(order => 
-          order.id === orderId 
-            ? { ...order, status: newStatus }
+          (order._id || order.id) === orderId 
+            ? { ...order, ...orderData }
             : order
         )
       );
       const updatedOrders = orders.map(order => 
-        order.id === orderId ? { ...order, status: newStatus } : order
+        (order._id || order.id) === orderId ? { ...order, ...orderData } : order
       );
       setStats(calculateStats(updatedOrders));
       return true;
     } catch (err: any) {
-      console.error('Error updating order status:', err);
-      setError(err.response?.data?.message || 'Failed to update order status');
+      console.error('Error updating order:', err);
+      setError(err.response?.data?.message || 'Failed to update order');
       return false;
     }
   }, [orders, calculateStats]);
+
+  const updateOrderStatus = useCallback(async (orderId: string, newStatus: Order['status']) => {
+    return updateOrder(orderId, { status: newStatus });
+  }, [updateOrder]);
 
   const deleteOrder = useCallback(async (orderId: string) => {
     try {
@@ -119,6 +123,7 @@ export const useOrders = () => {
     error,
     stats,
     fetchOrders,
+    updateOrder,
     updateOrderStatus,
     deleteOrder,
     filterOrders,

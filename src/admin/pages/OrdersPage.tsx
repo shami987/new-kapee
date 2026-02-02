@@ -8,6 +8,8 @@ export const OrdersPage = () => {
   // State for UI interactions
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingOrderId, setEditingOrderId] = useState<string | null>(null);
+  const [editFormData, setEditFormData] = useState<any>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({});
@@ -19,6 +21,7 @@ export const OrdersPage = () => {
     error,
     stats,
     fetchOrders,
+    updateOrder,
     deleteOrder,
     filterOrders,
   } = useOrders();
@@ -44,13 +47,49 @@ export const OrdersPage = () => {
   };
 
   // Handle order deletion
-  const handleDeleteOrder = async (orderId: string) => {
-    if (window.confirm('Are you sure you want to delete this order?')) {
-      const success = await deleteOrder(orderId);
+  const handleDeleteOrder = async (order: Order) => {
+    const customerName = order.user?.email || 'Unknown Customer';
+    const orderTotal = formatCurrency(order.total || 0);
+    
+    if (window.confirm(`Are you sure you want to delete this order?\n\nOrder ID: ${order._id || order.id}\nCustomer: ${customerName}\nTotal: ${orderTotal}\n\nThis action cannot be undone.`)) {
+      const success = await deleteOrder(order._id || order.id);
       if (success) {
-        // Show success message or toast notification here
-        console.log('Order deleted successfully');
+        alert('Order deleted successfully!');
+      } else {
+        alert('Failed to delete order. Please try again.');
       }
+    }
+  };
+
+  // Handle order editing
+  const handleEditOrder = (order: Order) => {
+    setEditingOrderId(order._id || order.id);
+    setEditFormData({
+      status: order.status,
+      total: order.total || 0,
+      customerEmail: order.user?.email || ''
+    });
+  };
+
+  // Handle cancel edit
+  const handleCancelEdit = () => {
+    setEditingOrderId(null);
+    setEditFormData({});
+  };
+
+  // Handle update order
+  const handleUpdateOrder = async (orderId: string) => {
+    const success = await updateOrder(orderId, {
+      status: editFormData.status,
+      total: editFormData.total,
+      // Note: Customer email update would require updating the user record separately
+    });
+    if (success) {
+      alert('Order updated successfully!');
+      setEditingOrderId(null);
+      setEditFormData({});
+    } else {
+      alert('Failed to update order. Please try again.');
     }
   };
 
@@ -192,73 +231,125 @@ export const OrdersPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {paginatedOrders.map((order) => (
-                    <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                      <td className="py-4 px-6">
-                        <span className="font-mono text-sm font-medium text-blue-600">#{order._id || order.id}</span>
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                            <span className="text-xs font-medium text-gray-600">
-                              {order.user?.email ? 
-                                order.user.email.charAt(0).toUpperCase() : 
-                                'U'
-                              }
+                  {paginatedOrders.map((order) => {
+                    const isEditing = editingOrderId === (order._id || order.id);
+                    
+                    return (
+                      <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <td className="py-4 px-6">
+                          <span className="font-mono text-sm font-medium text-blue-600">#{order._id || order.id}</span>
+                        </td>
+                        <td className="py-4 px-6">
+                          {isEditing ? (
+                            <input
+                              type="email"
+                              value={editFormData.customerEmail}
+                              onChange={(e) => setEditFormData({...editFormData, customerEmail: e.target.value})}
+                              className="w-full p-1 border rounded text-sm"
+                              placeholder="Customer email"
+                            />
+                          ) : (
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                                <span className="text-xs font-medium text-gray-600">
+                                  {order.user?.email ? 
+                                    order.user.email.charAt(0).toUpperCase() : 
+                                    'U'
+                                  }
+                                </span>
+                              </div>
+                              <span className="font-medium text-gray-900">
+                                {order.user?.email || 'Guest User'}
+                              </span>
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-4 px-6 text-gray-600">
+                          {order.items.length} item{order.items.length !== 1 ? 's' : ''}
+                        </td>
+                        <td className="py-4 px-6">
+                          {isEditing ? (
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={editFormData.total}
+                              onChange={(e) => setEditFormData({...editFormData, total: parseFloat(e.target.value)})}
+                              className="w-20 p-1 border rounded text-sm"
+                            />
+                          ) : (
+                            <span className="font-bold text-gray-900">{formatCurrency(order.total || 0)}</span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6">
+                          {isEditing ? (
+                            <select
+                              value={editFormData.status}
+                              onChange={(e) => setEditFormData({...editFormData, status: e.target.value})}
+                              className="p-1 border rounded text-sm"
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="paid">Paid</option>
+                              <option value="shipped">Shipped</option>
+                              <option value="completed">Completed</option>
+                              <option value="cancelled">Cancelled</option>
+                            </select>
+                          ) : (
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
+                              {getStatusText(order.status)}
                             </span>
-                          </div>
-                          <span className="font-medium text-gray-900">
-                            {order.user?.email || 'Guest User'}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-6 text-gray-600">
-                        {order.items.length} item{order.items.length !== 1 ? 's' : ''}
-                      </td>
-                      <td className="py-4 px-6 font-bold text-gray-900">
-                        {formatCurrency(order.total)}
-                      </td>
-                      <td className="py-4 px-6">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
-                          {getStatusText(order.status)}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6 text-gray-600">
-                        {formatDate(order.createdAt)}
-                      </td>
-                      <td className="py-4 px-6">
-                        <div className="flex gap-1">
-                          {/* View order details */}
-                          <button
-                            onClick={() => handleViewOrder(order)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            title="View Details"
-                          >
-                            <Eye size={16} />
-                          </button>
-                          {/* Edit order (could open status update modal) */}
-                          <button 
-                            className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors" 
-                            title="Edit"
-                          >
-                            <Edit size={16} />
-                          </button>
-                          {/* Delete order with confirmation */}
-                          <button 
-                            onClick={() => handleDeleteOrder(order.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" 
-                            title="Delete"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                          {/* More actions menu */}
-                          <button className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors" title="More">
-                            <MoreVertical size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                          )}
+                        </td>
+                        <td className="py-4 px-6 text-gray-600">
+                          {formatDate(order.createdAt)}
+                        </td>
+                        <td className="py-4 px-6">
+                          {isEditing ? (
+                            <div className="flex gap-1">
+                              <button
+                                onClick={() => handleUpdateOrder(order._id || order.id)}
+                                className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+                              >
+                                Update
+                              </button>
+                              <button
+                                onClick={handleCancelEdit}
+                                className="px-3 py-1 bg-gray-300 text-gray-700 rounded text-sm hover:bg-gray-400"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex gap-1">
+                              <button
+                                onClick={() => handleViewOrder(order)}
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="View Details"
+                              >
+                                <Eye size={16} />
+                              </button>
+                              <button 
+                                onClick={() => handleEditOrder(order)}
+                                className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors" 
+                                title="Edit"
+                              >
+                                <Edit size={16} />
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteOrder(order)}
+                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" 
+                                title="Delete"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                              <button className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors" title="More">
+                                <MoreVertical size={16} />
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

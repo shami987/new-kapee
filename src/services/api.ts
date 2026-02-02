@@ -137,7 +137,10 @@ export const adminOrdersAPI = {
   // Get specific order
   getOrder: (orderId: string) => apiClient.get(`/admin/orders/${orderId}`),
   
-  // Update order status
+  // Update entire order
+  updateOrder: (orderId: string, orderData: any) => apiClient.put(`/admin/orders/${orderId}`, orderData),
+  
+  // Update order status only
   updateOrderStatus: (orderId: string, status: string) => apiClient.put(`/admin/orders/${orderId}`, { status }),
   
   // Delete order
