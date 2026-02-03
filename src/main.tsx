@@ -8,6 +8,7 @@ import { ProductDetailPage } from './pages/ProductDetailPage.tsx'
 import { CategoryPage } from './pages/CategoryPage.tsx'
 import { CheckoutPage } from './pages/CheckoutPage.tsx'
 import { OrderCompletePage } from './pages/OrderCompletePage.tsx'
+import { ResetPasswordPage } from './pages/ResetPasswordPage.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx'
 import { AdminDashboard, OrdersPage, ProductsPage, CategoriesPage, CustomersPage } from './admin'
 import { AdminAddProduct } from './pages/admin/AdminAddProduct.tsx'
@@ -43,6 +44,9 @@ createRoot(document.getElementById('root')!).render(
             
             {/* Order completion page */}
             <Route path="/order-complete" element={<OrderCompletePage />} />
+            
+            {/* Reset password page */}
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
             
             {/* Admin routes */}
             <Route path="/admin" element={<AdminDashboard />} />

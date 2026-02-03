@@ -33,11 +33,14 @@ export const ForgotPasswordModal = ({ isOpen, onClose, onBackToLogin }: ForgotPa
     forgotPassword(
       { email },
       {
-        onSuccess: () => {
+        onSuccess: (data) => {
+          console.log('✅ Password reset success:', data);
           setIsSuccess(true);
         },
         onError: (err: any) => {
-          setError(err?.response?.data?.message || 'Failed to send reset email. Please try again.');
+          console.error('❌ Password reset error:', err);
+          const errorMsg = err?.response?.data?.message || err?.message || 'Failed to send reset email. Please try again.';
+          setError(errorMsg);
         },
       }
     );

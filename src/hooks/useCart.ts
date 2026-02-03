@@ -41,6 +41,13 @@ export const useCart = () => {
   // Use backend cart if logged in, otherwise local cart
   const cartItems: CartItem[] = isLoggedIn ? (Array.isArray(backendCartItems) ? backendCartItems : []) : localCartItems;
   
+  // Clear backend cart data when logged out
+  useEffect(() => {
+    if (!isLoggedIn) {
+      queryClient.setQueryData([' cart'], []);
+    }
+  }, [isLoggedIn, queryClient]);
+  
   console.log('🛒 Cart Debug:', { 
     isLoggedIn, 
     backendItems: Array.isArray(backendCartItems) ? backendCartItems : 'not array', 
