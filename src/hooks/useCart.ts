@@ -154,14 +154,19 @@ export const useCart = () => {
   };
 
   const getTotalPrice = useMemo(() => {
-    if (!Array.isArray(cartItems)) return 0;
-    return cartItems.reduce((total: number, item: CartItem) => {
+    if (!Array.isArray(cartItems)) {
+      console.log('💰 Cart items not array:', cartItems);
+      return 0;
+    }
+    const total = cartItems.reduce((total: number, item: CartItem) => {
       const product = item.product || item; // Handle nested product structure
       const price = Number(product.price || 0);
       const quantity = Number(item.quantity || 1);
       console.log('Price calculation:', { item: product.name, price, quantity, subtotal: price * quantity });
       return total + (price * quantity);
     }, 0);
+    console.log('💰 Final total price:', total);
+    return total;
   }, [cartItems]);
 
   const getTotalItems = useMemo(() => {
@@ -188,12 +193,15 @@ export const useCart = () => {
     paymentMethod?: string,
     userId?: number
   ): Order => {
-    const items: OrderItem[] = cartItems.map((item: CartItem) => ({
-      productId: item._id,
-      name: item.name,
-      price: item.price,
-      quantity: item.quantity,
-    }));
+    const items: OrderItem[] = cartItems.map((item: CartItem) => {
+      const product = item.product || item;
+      return {
+        productId: product._id || item._id,
+        name: product.name || item.name,
+        price: product.price || item.price,
+        quantity: item.quantity,
+      };
+    });
 
     const subtotal = Number(getTotalPrice.toFixed(2));
     const shipping = 5.0;
@@ -222,7 +230,23 @@ export const useCart = () => {
     userId?: number
   ) => {
     const orderPayload = buildOrder(shippingAddress, paymentMethod, userId);
-    const response = await ordersAPI.createOrder(orderPayload);
+    
+    // Create payload matching backend expectations
+    const payload = {
+      items: orderPayload.items.map(item => ({
+        product: item.productId,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity
+      })),
+      subtotal: Number(orderPayload.subtotal),
+      total: Number(orderPayload.total),
+      totalAmount: Number(orderPayload.total), // Backend might expect this field too
+      shippingAddress: orderPayload.shippingAddress,
+      paymentMethod: orderPayload.paymentMethod || 'cash'
+    };
+    
+    const response = await ordersAPI.createOrder(payload as Order);
     clearCart();
     return response.data as Order;
   };

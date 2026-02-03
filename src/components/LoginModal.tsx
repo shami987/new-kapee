@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Eye, EyeOff, LogIn } from 'lucide-react';
 import { useLogin } from '../hooks/useLogin';
+import { ForgotPasswordModal } from './ForgotPasswordModal';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export const LoginModal = ({ isOpen, onClose, onSwitchToSignup }: LoginModalProp
 
   const [localError, setLocalError] = useState('');
   const [persistentError, setPersistentError] = useState('');
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const { mutate: login, isPending } = useLogin();
 
@@ -185,9 +187,13 @@ export const LoginModal = ({ isOpen, onClose, onSwitchToSignup }: LoginModalProp
                   />
                   <span className="text-blue-600">Remember me</span>
                 </label>
-                <a href="#" className="text-blue-600 hover:underline text-sm md:text-base">
+                <button
+                  type="button"
+                  onClick={() => setShowForgotPassword(true)}
+                  className="text-blue-600 hover:underline text-sm md:text-base"
+                >
                   Lost your password?
-                </a>
+                </button>
               </div>
 
               <button
@@ -216,6 +222,12 @@ export const LoginModal = ({ isOpen, onClose, onSwitchToSignup }: LoginModalProp
           </div>
         </div>
       </div>
+
+      <ForgotPasswordModal
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+        onBackToLogin={() => setShowForgotPassword(false)}
+      />
     </div>
   );
 };
