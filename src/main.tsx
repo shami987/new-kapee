@@ -9,6 +9,7 @@ import { CategoryPage } from './pages/CategoryPage.tsx'
 import { CheckoutPage } from './pages/CheckoutPage.tsx'
 import { OrderCompletePage } from './pages/OrderCompletePage.tsx'
 import { ResetPasswordPage } from './pages/ResetPasswordPage.tsx'
+import { CustomerDashboard } from './pages/CustomerDashboard.tsx'
 import { AuthProvider } from './contexts/AuthContext.tsx'
 import { AdminDashboard, OrdersPage, ProductsPage, CategoriesPage, CustomersPage } from './admin'
 import { AdminAddProduct } from './pages/admin/AdminAddProduct.tsx'
@@ -47,6 +48,9 @@ createRoot(document.getElementById('root')!).render(
             
             {/* Reset password page */}
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+            
+            {/* Customer dashboard */}
+            <Route path="/dashboard" element={<CustomerDashboard />} />
             
             {/* Admin routes */}
             <Route path="/admin" element={<AdminDashboard />} />

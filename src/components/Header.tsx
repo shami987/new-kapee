@@ -161,6 +161,14 @@ export const Header = ({ cartItemsCount, onCartClick, onSearch }: HeaderProps) =
                         <p className="font-semibold">{user?.name}</p>
                         <p className="text-sm text-gray-600">{user?.email}</p>
                       </div>
+                      <a 
+                        href="/dashboard"
+                        className="flex items-center space-x-2 w-full text-left px-4 py-3 hover:bg-gray-100"
+                        onClick={() => setShowUserDropdown(false)}
+                      >
+                        <User className="h-4 w-4" />
+                        <span>Dashboard</span>
+                      </a>
                       <button 
                         onClick={() => {
                           logout();
