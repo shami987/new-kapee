@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
+import { emailService } from '../services/emailService';
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -65,6 +66,26 @@ export const CheckoutPage = () => {
         };
 
         const createdOrder = await checkout(shippingAddress);
+        
+        // Send order confirmation email
+        try {
+          await emailService.sendOrderConfirmation({
+            orderId: createdOrder._id || createdOrder.id,
+            email: formData.email,
+            customerName: `${formData.firstName} ${formData.lastName}`,
+            orderDetails: {
+              items: cartItems,
+              total: total,
+              subtotal: subtotal,
+              shipping: shippingCost,
+              shippingAddress
+            }
+          });
+          console.log('✅ Order confirmation email sent');
+        } catch (emailError) {
+          console.error('❌ Failed to send confirmation email:', emailError);
+          // Don't fail the order if email fails
+        }
 
         // Navigate to order complete page and pass created order via state
         setIsSubmitting(false);
