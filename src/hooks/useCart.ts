@@ -253,7 +253,24 @@ export const useCart = () => {
       paymentMethod: orderPayload.paymentMethod || 'cash'
     };
     
-    const response = await ordersAPI.createOrder(payload as Order);
+    const order: Order = {
+      id: `order_${Date.now()}`,
+      items: payload.items.map(item => ({
+        productId: item.product,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity
+      })),
+      subtotal: payload.subtotal,
+      shipping: 5.0,
+      total: payload.total,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      shippingAddress: payload.shippingAddress,
+      paymentMethod: payload.paymentMethod
+    };
+    
+    const response = await ordersAPI.createOrder(order);
     clearCart();
     return response.data as Order;
   };

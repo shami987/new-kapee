@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Package, Heart, Settings, LogOut, Eye, Edit, Trash2, Calendar, DollarSign } from 'lucide-react';
+import { User, Package, Heart, Settings, LogOut, Eye, Trash2, Calendar, DollarSign } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Header } from '../components/Header';
 import { useCart } from '../hooks/useCart';
