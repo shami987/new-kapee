@@ -108,18 +108,12 @@ export const useCart = () => {
     console.log('Adding to cart:', { product: product.name, quantity, isLoggedIn });
     
     if (!isLoggedIn) {
-      alert('Please log in to add items to cart');
-      return;
+      throw new Error('Please log in to add items to cart');
     }
     
     console.log('Using backend cart API');
-    try {
-      await addToCartMutation.mutateAsync({ productId: product._id, quantity });
-      console.log('✅ Successfully added to backend cart');
-    } catch (error) {
-      console.error('❌ Backend cart failed:', error);
-      alert('Failed to add item to cart. Please try again.');
-    }
+    await addToCartMutation.mutateAsync({ productId: product._id, quantity });
+    console.log('✅ Successfully added to backend cart');
   };
 
   const removeFromCart = (productId: string) => {

@@ -1,14 +1,30 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
 import type { Order } from '../types';
+import { Header } from '../components/Header';
+import { StickyNav } from '../components/StickyNav';
+import { Footer } from '../components/Footer';
+import { useCart } from '../hooks/useCart';
 
 export const OrderCompletePage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const order = (location.state as any)?.order as Order | undefined;
+  const { getTotalItems } = useCart();
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Header
+        cartItemsCount={getTotalItems}
+        onCartClick={() => {}}
+        onSearch={() => {}}
+      />
+      
+      <StickyNav
+        cartItemsCount={getTotalItems}
+        onCartClick={() => {}}
+      />
+      
       {/* Breadcrumb */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -127,6 +143,8 @@ export const OrderCompletePage = () => {
           </div>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };

@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { emailService } from '../services/emailService';
+import { Header } from '../components/Header';
+import { StickyNav } from '../components/StickyNav';
+import { Footer } from '../components/Footer';
 
 export const CheckoutPage = () => {
   const navigate = useNavigate();
-  const { cartItems, getTotalPrice, checkout } = useCart();
+  const { cartItems, getTotalPrice, getTotalItems, checkout } = useCart();
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -104,6 +107,17 @@ export const CheckoutPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Header
+        cartItemsCount={getTotalItems}
+        onCartClick={() => {}}
+        onSearch={() => {}}
+      />
+      
+      <StickyNav
+        cartItemsCount={getTotalItems}
+        onCartClick={() => {}}
+      />
+      
       {/* Breadcrumb */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -387,6 +401,8 @@ export const CheckoutPage = () => {
           </div>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { User, Package, Heart, Settings, LogOut, Eye, Trash2, Calendar, DollarSign } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Header } from '../components/Header';
+import { StickyNav } from '../components/StickyNav';
+import { Footer } from '../components/Footer';
 import { useCart } from '../hooks/useCart';
 import { useOrders } from '../hooks/useOrders';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -30,6 +32,11 @@ export const CustomerDashboard = () => {
         cartItemsCount={getTotalItems}
         onCartClick={() => {}}
         onSearch={() => {}}
+      />
+      
+      <StickyNav
+        cartItemsCount={getTotalItems}
+        onCartClick={() => {}}
       />
 
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -86,6 +93,8 @@ export const CustomerDashboard = () => {
           </div>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 };

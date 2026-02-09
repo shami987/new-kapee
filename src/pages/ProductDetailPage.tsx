@@ -4,7 +4,11 @@ import { useQuery } from '@tanstack/react-query';
 import { Star, Heart, Share2, Truck, HelpCircle, Minus, Plus } from 'lucide-react';
 
 import { Header } from '../components/Header';
+import { StickyNav } from '../components/StickyNav';
 import { CartSidebar } from '../components/CartSidebar';
+import { Footer } from '../components/Footer';
+import { LoginModal } from '../components/LoginModal';
+import { SignupModal } from '../components/SignupModal';
 import { useCart } from '../hooks/useCart';
 import { useAuth } from '../contexts/AuthContext';
 import { getAllProducts } from '../services/productService';
@@ -16,6 +20,8 @@ export const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isSignupModalOpen, setIsSignupModalOpen] = useState(false);
 
   const {
     cartItems,
@@ -54,6 +60,11 @@ export const ProductDetailPage = () => {
         cartItemsCount={getTotalItems}
         onCartClick={() => setIsCartOpen(true)}
         onSearch={() => {}}
+      />
+      
+      <StickyNav
+        cartItemsCount={getTotalItems}
+        onCartClick={() => setIsCartOpen(true)}
       />
 
       <CartSidebar
@@ -159,6 +170,10 @@ export const ProductDetailPage = () => {
 
               <button
                 onClick={async () => {
+                  if (!isLoggedIn) {
+                    setIsLoginModalOpen(true);
+                    return;
+                  }
                   await addToCart(product, quantity);
                   setIsCartOpen(true);
                 }}
@@ -197,6 +212,26 @@ export const ProductDetailPage = () => {
           </div>
         </div>
       </div>
+      
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onSwitchToSignup={() => {
+          setIsLoginModalOpen(false);
+          setIsSignupModalOpen(true);
+        }}
+      />
+
+      <SignupModal
+        isOpen={isSignupModalOpen}
+        onClose={() => setIsSignupModalOpen(false)}
+        onSwitchToLogin={() => {
+          setIsSignupModalOpen(false);
+          setIsLoginModalOpen(true);
+        }}
+      />
+      
+      <Footer />
     </div>
   );
 };
