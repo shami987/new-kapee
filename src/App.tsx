@@ -54,21 +54,15 @@ function App() {
   const { isLoggedIn } = useAuth();
 
   // Fetch products from backend
-  const { data: products = [], isLoading: productsLoading } = useQuery({
+  const { data: products = [], isLoading: productsLoading, error } = useQuery({
     queryKey: ['products'],
     queryFn: getAllProducts,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 2,
   });
 
-  if (productsLoading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading products...</p>
-        </div>
-      </div>
-    );
-  }
+  // Don't block the entire app - show layout immediately
+  const shouldShowProducts = !productsLoading && !error;
 
   return (
     <div className="min-h-screen bg-white">
@@ -98,20 +92,23 @@ function App() {
         />
         
         <ProductShowcase 
-          products={products} 
+          products={shouldShowProducts ? products : []} 
           onAddToCart={addToCart}
           onLoginRequired={() => setIsLoginModalOpen(true)}
+          isLoading={productsLoading}
         />
         <WomenShowcase 
-          products={products} 
+          products={shouldShowProducts ? products : []} 
           onAddToCart={addToCart}
           onLoginRequired={() => setIsLoginModalOpen(true)}
+          isLoading={productsLoading}
         />
         
         <PopularFashion 
-          products={products} 
+          products={shouldShowProducts ? products : []} 
           onAddToCart={addToCart}
           onLoginRequired={() => setIsLoginModalOpen(true)}
+          isLoading={productsLoading}
         />
         
         <FashionCategories categories={categories} />
