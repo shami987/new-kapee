@@ -18,7 +18,16 @@ import { CartsPage } from './admin/pages/CartsPage.tsx'
 
 // Create React Query client
 // This manages all server state and caching
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      gcTime: 30 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+})
 
 // Create root element and render app
 createRoot(document.getElementById('root')!).render(

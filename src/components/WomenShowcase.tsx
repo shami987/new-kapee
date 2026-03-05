@@ -6,9 +6,10 @@ interface WomenShowcaseProps {
   products: Product[];
   onAddToCart: (product: Product) => void;
   onLoginRequired?: () => void;
+  isLoading?: boolean;
 }
 
-export const WomenShowcase = ({ products, onAddToCart, onLoginRequired }: WomenShowcaseProps) => {
+export const WomenShowcase = ({ products, onAddToCart, onLoginRequired, isLoading = false }: WomenShowcaseProps) => {
   const [bannerIndex, setBannerIndex] = useState(0);
 
   const bannerSlides = [
@@ -33,6 +34,14 @@ export const WomenShowcase = ({ products, onAddToCart, onLoginRequired }: WomenS
   );
 
   const displayProducts = womenProducts.slice(0, 6);
+
+  if (isLoading) {
+    return (
+      <section className="py-12 text-center text-gray-500">
+        Loading products...
+      </section>
+    );
+  }
 
   return (
     <section className="py-12 bg-white">

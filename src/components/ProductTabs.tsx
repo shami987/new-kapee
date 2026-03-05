@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { getAllProducts } from '../services/productService';
-import { useQuery } from '@tanstack/react-query';
+import { useProducts } from '../hooks/useProducts';
 
 const categories = [
   { letter: 'B', name: 'BEAUTY', tagline: 'BEAUTY TAGLINE' },
@@ -16,10 +15,7 @@ export const ProductTabs = () => {
   const tabs = ['RECENT', 'FEATURED', 'ON SALE', 'TOP RATED'] as const;
 
   // Fetch products from backend
-  const { data: backendProducts = [], isLoading } = useQuery({
-    queryKey: ['products'],
-    queryFn: getAllProducts,
-  });
+  const { data: backendProducts = [], isLoading } = useProducts();
 
   // Organize products by category - ensure each category has at least some products
   const productData = {

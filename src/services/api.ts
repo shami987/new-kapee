@@ -23,14 +23,36 @@ apiClient.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // Track request duration to surface possible backend cold starts.
+  (config as any).metadata = { startTime: Date.now() };
   return config;
 });
 
 // Interceptor: Handle response errors
 // This runs after receiving a response from the backend
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const startTime = (response.config as any)?.metadata?.startTime;
+    const durationMs = startTime ? Date.now() - startTime : 0;
+
+    if (durationMs > 4000) {
+      console.warn(
+        `[API Slow] ${response.config.method?.toUpperCase()} ${response.config.url} took ${durationMs}ms. Possible backend cold start/sleep.`
+      );
+    }
+
+    return response;
+  },
   (error) => {
+    const startTime = (error.config as any)?.metadata?.startTime;
+    const durationMs = startTime ? Date.now() - startTime : 0;
+    if (durationMs > 4000) {
+      console.warn(
+        `[API Slow/Error] ${error.config?.method?.toUpperCase()} ${error.config?.url} failed after ${durationMs}ms. Possible backend cold start/sleep.`
+      );
+    }
+
     // If we get a 401 (Unauthorized) response, it means the token is invalid
     if (error.response?.status === 401) {
       // Clear the token and user data from storage

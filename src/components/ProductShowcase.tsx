@@ -6,9 +6,10 @@ interface ProductShowcaseProps {
   products: Product[];
   onAddToCart: (product: Product) => void;
   onLoginRequired?: () => void;
+  isLoading?: boolean;
 }
 
-export const ProductShowcase = ({ products, onAddToCart, onLoginRequired }: ProductShowcaseProps) => {
+export const ProductShowcase = ({ products, onAddToCart, onLoginRequired, isLoading = false }: ProductShowcaseProps) => {
   const [selectedCategory, setSelectedCategory] = useState("Men's Fashion");
   const [bannerIndex, setBannerIndex] = useState(0);
 
@@ -44,7 +45,7 @@ export const ProductShowcase = ({ products, onAddToCart, onLoginRequired }: Prod
   // Show only first 6 products
   const displayProducts = products.slice(0, 6);
 
-  if (products.length === 0) {
+  if (isLoading || products.length === 0) {
     return (
       <section className="py-12 text-center text-gray-500">
         Loading products...

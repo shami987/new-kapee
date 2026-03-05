@@ -6,9 +6,10 @@ interface PopularFashionProps {
   products: Product[];
   onAddToCart: (product: Product) => void;
   onLoginRequired?: () => void;
+  isLoading?: boolean;
 }
 
-export const PopularFashion = ({ products, onAddToCart, onLoginRequired }: PopularFashionProps) => {
+export const PopularFashion = ({ products, onAddToCart, onLoginRequired, isLoading = false }: PopularFashionProps) => {
   const [selectedCategory, setSelectedCategory] = useState('Women');
 
   const categories = [
@@ -41,6 +42,14 @@ export const PopularFashion = ({ products, onAddToCart, onLoginRequired }: Popul
   });
 
   const displayProducts = filteredProducts.slice(0, 8);
+
+  if (isLoading) {
+    return (
+      <section className="py-16 text-center text-gray-500">
+        Loading products...
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-white">
