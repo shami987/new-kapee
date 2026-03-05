@@ -1,12 +1,13 @@
 import { useParams } from 'react-router-dom';
 import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Header } from '../components/Header';
 import { StickyNav } from '../components/StickyNav';
 import { ProductCard } from '../components/ProductCard';
 import { CartSidebar } from '../components/CartSidebar';
 import { useCart } from '../hooks/useCart';
-import { useProducts } from '../hooks/useProducts';
-import { useCategories } from '../hooks/useCategories';
+import { getAllProducts } from '../services/productService';
+import { getCategories } from '../services/categoryService';
 import { products as localProducts, categories as localCategories } from '../data/products';
 
 export const CategoryPage = () => {
@@ -23,9 +24,15 @@ export const CategoryPage = () => {
   } = useCart();
 
   // Fetch products and categories from backend
-  const { data: products = [], isLoading: productsLoading } = useProducts();
+  const { data: products = [], isLoading: productsLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: getAllProducts,
+  });
 
-  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery({
+    queryKey: ['categories'],
+    queryFn: getCategories,
+  });
 
   // Use API data if available, otherwise fallback to local data
   const allProducts = products.length > 0 ? products : localProducts;
@@ -42,6 +49,9 @@ export const CategoryPage = () => {
   // Filter products by category
   const filteredProducts = useMemo(() => {
     if (!decodedCategoryName) return [];
+    
+    console.log('Decoded category name:', decodedCategoryName);
+    console.log('Available products:', allProducts.map(p => ({ name: p.name, category: p.category })));
 
     const filtered = allProducts.filter(product => {
       const productCategory = typeof product.category === 'string' 
@@ -51,13 +61,15 @@ export const CategoryPage = () => {
       const searchCategory = decodedCategoryName.toLowerCase();
       
       // Check for exact match or partial match
-      return (
-        productCategory.includes(searchCategory) ||
-        searchCategory.includes(productCategory) ||
-        productCategory === searchCategory
-      );
+      const matches = productCategory.includes(searchCategory) || 
+                     searchCategory.includes(productCategory) ||
+                     productCategory === searchCategory;
+      
+      console.log(`Product: ${product.name}, Category: ${productCategory}, Search: ${searchCategory}, Matches: ${matches}`);
+      return matches;
     });
-
+    
+    console.log('Filtered products:', filtered);
     return filtered;
   }, [decodedCategoryName, allProducts]);
 

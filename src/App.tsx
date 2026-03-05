@@ -14,7 +14,8 @@ import { SignupModal } from './components/SignupModal';
 import { LoginModal } from './components/LoginModal';
 import { useCart } from './hooks/useCart';
 import { useAuth } from './contexts/AuthContext';
-import { useProducts } from './hooks/useProducts';
+import { useQuery } from '@tanstack/react-query';
+import { getAllProducts } from './services/productService';
 import { categories } from './data/products';
 
 const footerLinks = {
@@ -53,7 +54,12 @@ function App() {
   const { isLoggedIn } = useAuth();
 
   // Fetch products from backend
-  const { data: products = [], isLoading: productsLoading, error } = useProducts();
+  const { data: products = [], isLoading: productsLoading, error } = useQuery({
+    queryKey: ['products'],
+    queryFn: getAllProducts,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 2,
+  });
 
   // Don't block the entire app - show layout immediately
   const shouldShowProducts = !productsLoading && !error;

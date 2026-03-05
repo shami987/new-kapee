@@ -2,7 +2,7 @@ import { apiClient } from './api';
 
 export const getAllProducts = async (): Promise<any[]> => {
   const res = await apiClient.get('/products');
-  return res.data?.products ?? [];
+  return res.data.products;
 };
 
 // Alias for backward compatibility

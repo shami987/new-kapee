@@ -1,10 +1,10 @@
 import { AdminLayout } from '../components';
 import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminProductsAPI } from '../../services/api';
+import { getCategories } from '../../services/categoryService';
 import type { Category } from '../../types';
-import { useCategories } from '../../hooks/useCategories';
 
 export const ProductsPage = () => {
   const queryClient = useQueryClient();
@@ -212,7 +212,7 @@ export const ProductsPage = () => {
 
 // Product Modal Component
 const ProductModal = ({ product, onSave, onClose }: { product: any, onSave: (data: any) => void, onClose: () => void }) => {
-  const { data: categories = [] } = useCategories() as { data: Category[] };
+  const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
     name: product?.name || '',
     description: product?.description || '',
@@ -222,6 +222,13 @@ const ProductModal = ({ product, onSave, onClose }: { product: any, onSave: (dat
     categoryId: product?.category?._id || '',
     image: product?.image || ''
   });
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    getCategories()
+      .then(setCategories)
+      .catch(console.error);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

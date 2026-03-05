@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Star, Heart, Share2, Truck, HelpCircle, Minus, Plus } from 'lucide-react';
 
 import { Header } from '../components/Header';
@@ -10,7 +11,7 @@ import { LoginModal } from '../components/LoginModal';
 import { SignupModal } from '../components/SignupModal';
 import { useCart } from '../hooks/useCart';
 import { useAuth } from '../contexts/AuthContext';
-import { useProducts } from '../hooks/useProducts';
+import { getAllProducts } from '../services/productService';
 
 
 
@@ -34,7 +35,10 @@ export const ProductDetailPage = () => {
 
   const { isLoggedIn } = useAuth();
 
-  const { data: products = [], isLoading } = useProducts();
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: getAllProducts,
+  });
 
   // Find the specific product by ID
   const product = products.find(p => (p._id || p.id) === id);

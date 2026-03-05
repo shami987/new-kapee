@@ -1,10 +1,10 @@
 import { AdminLayout } from '../components';
 import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react';
 import { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getCategories } from '../../services/categoryService';
 import { adminCategoriesAPI } from '../../services/api';
 import type { Category } from '../../types';
-import { useCategories } from '../../hooks/useCategories';
 
 export const CategoriesPage = () => {
   const queryClient = useQueryClient();
@@ -13,13 +13,19 @@ export const CategoriesPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch categories from backend
-  const { data: categoriesData = [], isLoading } = useCategories() as { data: Category[]; isLoading: boolean };
+  const { data: categoriesData = [], isLoading } = useQuery({
+    queryKey: ['admin-categories'],
+    queryFn: async () => {
+      const categories = await getCategories();
+      return categories;
+    },
+  });
 
   // Create category mutation
   const createCategoryMutation = useMutation({
     mutationFn: (categoryData: any) => adminCategoriesAPI.createCategory(categoryData),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
       setShowAddForm(false);
       alert('Category created successfully!');
     },
@@ -32,7 +38,7 @@ export const CategoriesPage = () => {
   const updateCategoryMutation = useMutation({
     mutationFn: ({ id, data }: { id: string, data: any }) => adminCategoriesAPI.updateCategory(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
       setEditingCategory(null);
       alert('Category updated successfully!');
     },
@@ -45,7 +51,7 @@ export const CategoriesPage = () => {
   const deleteCategoryMutation = useMutation({
     mutationFn: (categoryId: string) => adminCategoriesAPI.deleteCategory(categoryId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-categories'] });
       alert('Category deleted successfully!');
     },
     onError: (error: any) => {

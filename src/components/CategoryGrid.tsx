@@ -1,12 +1,20 @@
 import type { Category } from '../types';
-import { useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCategories } from '../hooks/useCategories';
+import { getCategories } from '../services/categoryService';
 
 export const CategoryGrid = () => {
   const navigate = useNavigate();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const { data: categories = [] } = useCategories() as { data: Category[] };
+
+  // ðŸ”¹ Categories from backend
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    getCategories()
+      .then(setCategories)
+      .catch(console.error);
+  }, []);
 
   const duplicatedCategories = categories;
 
@@ -15,7 +23,7 @@ export const CategoryGrid = () => {
       const scrollAmount = 300;
       scrollContainerRef.current.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth',
+        behavior: 'smooth'
       });
     }
   };
@@ -23,7 +31,11 @@ export const CategoryGrid = () => {
   return (
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* Carousel with navigation buttons */}
         <div className="relative flex items-center gap-4">
+
+          {/* Previous Button */}
           <button
             onClick={() => scroll('left')}
             className="flex-shrink-0 bg-white border border-gray-300 rounded-full p-2 md:p-3 hover:bg-gray-100 hover:border-blue-500 transition-all shadow-md z-10"
@@ -34,12 +46,13 @@ export const CategoryGrid = () => {
             </svg>
           </button>
 
+          {/* Scrollable Container */}
           <div
             ref={scrollContainerRef}
             className="overflow-x-auto pb-2 flex-1 scroll-smooth"
             style={{
               scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
+              msOverflowStyle: 'none'
             }}
           >
             <style>{`
@@ -52,7 +65,9 @@ export const CategoryGrid = () => {
                   key={`${category.id}-${index}`}
                   className="flex flex-col items-center cursor-pointer group transition-all hover:scale-110 flex-shrink-0"
                   onClick={() =>
-                    navigate(`/category/${category.name.toLowerCase().replace(/\s+/g, '-')}`)
+                    navigate(
+                      `/category/${category.name.toLowerCase().replace(/\s+/g, '-')}`
+                    )
                   }
                 >
                   <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-3 border-gray-300 group-hover:border-blue-500 shadow-lg group-hover:shadow-xl bg-white">
@@ -70,6 +85,7 @@ export const CategoryGrid = () => {
             </div>
           </div>
 
+          {/* Next Button */}
           <button
             onClick={() => scroll('right')}
             className="flex-shrink-0 bg-white border border-gray-300 rounded-full p-2 md:p-3 hover:bg-gray-100 hover:border-blue-500 transition-all shadow-md z-10"
@@ -79,6 +95,7 @@ export const CategoryGrid = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
+
         </div>
       </div>
     </section>

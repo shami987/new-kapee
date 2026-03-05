@@ -1,7 +1,8 @@
 import type { Product } from '../types';
+import { useQuery } from '@tanstack/react-query';
 import { ProductCard } from './ProductCard';
 import { products as localProducts } from '../data/products';
-import { useProducts } from '../hooks/useProducts';
+import { getAllProducts } from '../services/productService';
 
 export const FeaturedProducts = ({
   onAddToCart,
@@ -13,7 +14,10 @@ export const FeaturedProducts = ({
   onViewAll?: () => void;
 }) => {
 
-  const { data: products = [], isLoading } = useProducts();
+  const { data: products = [], isLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: getAllProducts,
+  });
 
   if (isLoading) return <p>Loading products...</p>;
 
