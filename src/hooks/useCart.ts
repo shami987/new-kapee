@@ -44,7 +44,7 @@ export const useCart = () => {
   // Clear backend cart data when logged out
   useEffect(() => {
     if (!isLoggedIn) {
-      queryClient.setQueryData([' cart'], []);
+      queryClient.setQueryData(['cart'], []);
     }
   }, [isLoggedIn, queryClient]);
   
