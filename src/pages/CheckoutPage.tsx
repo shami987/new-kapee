@@ -84,9 +84,7 @@ export const CheckoutPage = () => {
               shippingAddress
             }
           });
-          console.log('✅ Order confirmation email sent');
         } catch (emailError) {
-          console.error('❌ Failed to send confirmation email:', emailError);
           // Don't fail the order if email fails
         }
 
@@ -95,7 +93,6 @@ export const CheckoutPage = () => {
         navigate('/order-complete', { state: { order: createdOrder } });
       } catch (err) {
         setIsSubmitting(false);
-        console.error('Checkout failed', err);
         setErrors({ submit: 'Failed to place order. Please try again.' });
       }
     })();

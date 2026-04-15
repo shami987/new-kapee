@@ -49,9 +49,6 @@ export const CategoryPage = () => {
   // Filter products by category
   const filteredProducts = useMemo(() => {
     if (!decodedCategoryName) return [];
-    
-    console.log('Decoded category name:', decodedCategoryName);
-    console.log('Available products:', allProducts.map(p => ({ name: p.name, category: p.category })));
 
     const filtered = allProducts.filter(product => {
       const productCategory = typeof product.category === 'string' 
@@ -60,16 +57,13 @@ export const CategoryPage = () => {
       
       const searchCategory = decodedCategoryName.toLowerCase();
       
-      // Check for exact match or partial match
       const matches = productCategory.includes(searchCategory) || 
                      searchCategory.includes(productCategory) ||
                      productCategory === searchCategory;
       
-      console.log(`Product: ${product.name}, Category: ${productCategory}, Search: ${searchCategory}, Matches: ${matches}`);
       return matches;
     });
     
-    console.log('Filtered products:', filtered);
     return filtered;
   }, [decodedCategoryName, allProducts]);
 

@@ -43,14 +43,11 @@ export const ResetPasswordPage = () => {
       { token, newPassword: password },
       {
         onSuccess: (data) => {
-          console.log('✅ Password reset successful:', data);
           setIsSuccess(true);
           setTimeout(() => navigate('/'), 3000);
         },
         onError: (err: any) => {
-          console.error('❌ Password reset failed:', err);
           const errorMsg = err?.response?.data?.message || err?.message || 'Failed to reset password. Please try again.';
-          console.log('❌ Error details:', errorMsg);
           setError(errorMsg);
         },
       }

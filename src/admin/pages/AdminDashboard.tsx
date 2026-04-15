@@ -14,9 +14,7 @@ export const AdminDashboard = () => {
     refetch
   } = useDashboard();
 
-  const handleViewOrder = (orderId: string) => {
-    console.log('View order:', orderId);
-  };
+  const handleViewOrder = (_orderId: string) => {};
 
   if (loading) {
     return (

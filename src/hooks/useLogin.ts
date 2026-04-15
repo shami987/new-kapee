@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useAuth } from '../contexts/AuthContext';
 import { authAPI } from '../services/api';
 import { AxiosError } from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 // Type definition for login form data
 interface LoginPayload {
@@ -12,11 +13,12 @@ interface LoginPayload {
 // Type definition for successful login response from backend
 interface LoginResponse {
   message: string;
-  token: string; // JWT token for authentication
+  token: string;
   user: {
     id: string;
     name: string;
     email: string;
+    role?: string;
   };
 }
 
@@ -29,20 +31,21 @@ interface ErrorResponse {
 // Returns functions and states to manage the login process
 export const useLogin = () => {
   const { login } = useAuth();
+  const navigate = useNavigate();
   
   return useMutation<
-    LoginResponse,         // Type of successful response
-    AxiosError<ErrorResponse>,  // Type of error response
-    LoginPayload           // Type of data being sent
+    LoginResponse,
+    AxiosError<ErrorResponse>,
+    LoginPayload
   >({
-    // The actual function that sends login credentials to backend
     mutationFn: (data: LoginPayload) => {
       return authAPI.login(data).then((res) => res.data);
     },
-    // What to do after successful login
     onSuccess: (data) => {
-      // Use AuthContext to set login state
       login(data.token, data.user);
+      if (data.user.role === 'admin') {
+        navigate('/admin');
+      }
     },
   });
 };

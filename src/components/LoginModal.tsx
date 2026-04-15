@@ -29,13 +29,10 @@ export const LoginModal = ({ isOpen, onClose, onSwitchToSignup }: LoginModalProp
 
   // Sync internalOpen when parent opens the modal
   useEffect(() => {
-    console.log('🔄 Modal isOpen prop changed:', isOpen);
     if (isOpen) {
       setInternalOpen(true);
-      setTimeout(() => setIsVisible(true), 20); // trigger animation
+      setTimeout(() => setIsVisible(true), 20);
     } else {
-      // Parent is trying to close modal
-      console.log('🔄 Parent trying to close modal');
       setIsVisible(false);
       setTimeout(() => setInternalOpen(false), 200);
     }
@@ -77,41 +74,28 @@ export const LoginModal = ({ isOpen, onClose, onSwitchToSignup }: LoginModalProp
     setLocalError('');
     setPersistentError('');
 
-    console.log('🔑 Form submitted, starting validation...');
-
     // Client-side validation
     if (!email || !password) {
       setLocalError('Email and password are required');
-      console.log('❌ Validation failed: missing email or password');
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setLocalError('Please enter a valid email address');
-      console.log('❌ Validation failed: invalid email format');
       return;
     }
     if (password.length < 3) {
       setLocalError('Password must be at least 3 characters');
-      console.log('❌ Validation failed: password too short');
       return;
     }
 
-    console.log('🔑 Attempting login with:', { email, passwordLength: password.length });
-    console.log('🔑 Login function available:', typeof login);
-
-    // Send login request
     login(
       { email, password },
       {
         onSuccess: (data) => {
-          console.log('✅ Login successful:', data);
-          handleSuccessfulLogin(); // close modal only on success
+          handleSuccessfulLogin();
         },
         onError: (err: any) => {
-          console.error('❌ Login failed:', err);
-          console.log('🔄 Keeping modal open for error display');
-          // keep modal open, show error
           const msg =
             err?.response?.data?.message || 'Login failed. Please check your credentials.';
           setPersistentError(msg);

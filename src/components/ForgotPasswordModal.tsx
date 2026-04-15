@@ -34,7 +34,6 @@ export const ForgotPasswordModal = ({ isOpen, onClose, onBackToLogin }: ForgotPa
       { email },
       {
         onSuccess: (data) => {
-          console.log('✅ Password reset success:', data);
           setIsSuccess(true);
         },
         onError: (err: any) => {

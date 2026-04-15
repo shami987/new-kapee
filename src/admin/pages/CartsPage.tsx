@@ -30,21 +30,14 @@ export const CartsPage = () => {
 
   // Delete cart mutation
   const deleteCartMutation = useMutation({
-    mutationFn: (cartId: string) => {
-      console.log('Making DELETE request for cart ID:', cartId);
-      return adminCartAPI.deleteCart(cartId);
-    },
-    onSuccess: (data, cartId) => {
-      console.log('Delete successful:', data);
-      // Remove the cart from the cache immediately
+    mutationFn: (cartId: string) => adminCartAPI.deleteCart(cartId),
+    onSuccess: (_data, cartId) => {
       queryClient.setQueryData(['admin-carts'], (oldCarts: AdminCart[] = []) => 
         oldCarts.filter(cart => cart._id !== cartId)
       );
       alert('Cart deleted successfully!');
     },
     onError: (error: any) => {
-      console.error('Delete cart error:', error);
-      console.error('Error response:', error.response?.data);
       alert(`Failed to delete cart: ${error.response?.data?.message || error.message || 'Unknown error'}`);
     },
   });
@@ -89,12 +82,9 @@ export const CartsPage = () => {
     const itemCount = cart.items.length;
     const totalValue = getCartTotal(cart).toFixed(2);
     
-    console.log('Attempting to delete cart:', { cartId, cart });
-    
     const confirmMessage = `Are you sure you want to delete ${userName}'s cart?\n\nThis will permanently remove:\n• ${itemCount} item(s)\n• Total value: $${totalValue}\n\nThis action cannot be undone.`;
     
     if (window.confirm(confirmMessage)) {
-      console.log('Confirmed deletion for cart ID:', cartId);
       deleteCartMutation.mutate(cartId);
     }
   };

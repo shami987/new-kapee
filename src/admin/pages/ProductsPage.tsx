@@ -24,7 +24,6 @@ export const ProductsPage = () => {
   // Create product mutation
   const createProductMutation = useMutation({
     mutationFn: (productData: any) => {
-      console.log('Sending product data:', productData);
       return adminProductsAPI.createProduct(productData);
     },
     onSuccess: () => {
@@ -246,7 +245,6 @@ const ProductModal = ({ product, onSave, onClose }: { product: any, onSave: (dat
       quantity: parseInt(formData.quantity as string)
     };
     
-    console.log('Form data being submitted:', submitData);
     onSave(submitData);
   };
 

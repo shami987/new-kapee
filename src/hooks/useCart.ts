@@ -9,8 +9,6 @@ export const useCart = () => {
   const { isLoggedIn, user, token } = useAuth();
   const queryClient = useQueryClient();
   
-  console.log('🔐 Auth status:', { isLoggedIn, hasUser: !!user, hasToken: !!token });
-  
   // Local cart state for non-logged-in users
   const [localCartItems, setLocalCartItems] = useState<CartItem[]>(() => {
     const saved = localStorage.getItem('cart');
@@ -21,10 +19,8 @@ export const useCart = () => {
   const { data: backendCartItems = [], isLoading, error } = useQuery({
     queryKey: ['cart'],
     queryFn: async () => {
-      console.log('💾 Fetching cart from backend...');
       try {
         const res = await cartAPI.getCart();
-        console.log('💾 Backend cart response:', res.data);
         // Backend returns a cart object with items array, extract the items
         const cartData = res.data as any;
         return Array.isArray(cartData) ? cartData : (cartData?.items || []);
@@ -48,16 +44,6 @@ export const useCart = () => {
     }
   }, [isLoggedIn, queryClient]);
   
-  console.log('🛒 Cart Debug:', { 
-    isLoggedIn, 
-    backendItems: Array.isArray(backendCartItems) ? backendCartItems : 'not array', 
-    localItems: localCartItems,
-    finalCartItems: cartItems,
-    cartLength: cartItems.length,
-    isLoading,
-    error: error?.message
-  });
-
   // Update local storage when local cart changes
   useEffect(() => {
     if (!isLoggedIn) {
@@ -67,12 +53,9 @@ export const useCart = () => {
 
   // Mutations for backend cart operations
   const addToCartMutation = useMutation({
-    mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) => {
-      console.log('🚀 Making API call to add to cart:', { productId, quantity });
-      return cartAPI.addToCart(productId, quantity);
-    },
-    onSuccess: (data) => {
-      console.log('✅ Cart API success:', data);
+    mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) =>
+      cartAPI.addToCart(productId, quantity),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
     },
     onError: (error: any) => {
@@ -85,7 +68,6 @@ export const useCart = () => {
     mutationFn: ({ productId, quantity }: { productId: string; quantity: number }) => 
       cartAPI.updateCartItem(productId, quantity),
     onSuccess: () => {
-      console.log('✅ Backend update successful');
       queryClient.invalidateQueries({ queryKey: ['cart'] });
     },
     onError: (error) => {
@@ -96,7 +78,6 @@ export const useCart = () => {
   const removeFromCartMutation = useMutation({
     mutationFn: (productId: string) => cartAPI.removeFromCart(productId),
     onSuccess: () => {
-      console.log('✅ Backend removal successful');
       queryClient.invalidateQueries({ queryKey: ['cart'] });
     },
     onError: (error) => {
@@ -105,25 +86,16 @@ export const useCart = () => {
   });
 
   const addToCart = async (product: Product, quantity: number = 1) => {
-    console.log('Adding to cart:', { product: product.name, quantity, isLoggedIn });
-    
     if (!isLoggedIn) {
       throw new Error('Please log in to add items to cart');
     }
-    
-    console.log('Using backend cart API');
     await addToCartMutation.mutateAsync({ productId: product._id, quantity });
-    console.log('✅ Successfully added to backend cart');
   };
 
   const removeFromCart = (productId: string) => {
-    console.log('🗑️ Removing from cart:', productId, 'isLoggedIn:', isLoggedIn);
-    
     if (isLoggedIn) {
-      // Find the cart item and get the actual product ID
       const cartItem = cartItems.find(item => item._id === productId);
       const actualProductId = cartItem?.product?._id || productId;
-      console.log('🗑️ Using product ID for backend:', actualProductId);
       removeFromCartMutation.mutate(actualProductId);
     } else {
       // Use local storage for non-logged-in users
@@ -132,17 +104,13 @@ export const useCart = () => {
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
-    console.log('🔄 Updating quantity:', productId, 'to', quantity, 'isLoggedIn:', isLoggedIn);
     if (quantity <= 0) {
       removeFromCart(productId);
       return;
     }
-    
     if (isLoggedIn) {
-      // Find the cart item and get the actual product ID
       const cartItem = cartItems.find(item => item._id === productId);
       const actualProductId = cartItem?.product?._id || productId;
-      console.log('🔄 Using product ID for backend:', actualProductId);
       updateCartMutation.mutate({ productId: actualProductId, quantity });
     } else {
       // Use local storage for non-logged-in users
@@ -155,18 +123,13 @@ export const useCart = () => {
   };
 
   const getTotalPrice = useMemo(() => {
-    if (!Array.isArray(cartItems)) {
-      console.log('💰 Cart items not array:', cartItems);
-      return 0;
-    }
+    if (!Array.isArray(cartItems)) return 0;
     const total = cartItems.reduce((total: number, item: CartItem) => {
-      const product = item.product || item; // Handle nested product structure
+      const product = item.product || item;
       const price = Number(product.price || 0);
       const quantity = Number(item.quantity || 1);
-      console.log('Price calculation:', { item: product.name, price, quantity, subtotal: price * quantity });
       return total + (price * quantity);
     }, 0);
-    console.log('💰 Final total price:', total);
     return total;
   }, [cartItems]);
 

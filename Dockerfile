@@ -19,6 +19,9 @@ RUN npm ci --include=dev
 # Copy application code
 COPY . .
 
+# Copy production env file if exists
+COPY .env.production* ./
+
 # Build application (env vars baked into JS)
 RUN npm run build
 

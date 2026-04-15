@@ -25,15 +25,6 @@ export const CartSidebar = ({
 }: CartSidebarProps) => {
   const navigate = useNavigate();
   
-  console.log('🛒 CartSidebar Debug:', {
-    isOpen,
-    cartItems,
-    cartItemsLength: cartItems?.length,
-    totalPrice,
-    isLoading,
-    isBackend
-  });
-  
   if (!isOpen) return null;
 
   const freeShippingThreshold = 120;
@@ -67,9 +58,7 @@ export const CartSidebar = ({
             <p className="text-gray-500 text-center mt-8">Your cart is empty</p>
           ) : (
             cartItems.map((item) => {
-              console.log('📝 Cart item structure:', item);
-              // Handle different item structures from backend vs local
-              const product = item.product || item; // Backend has nested product, local doesn't
+              const product = item.product || item;
               const itemData = {
                 _id: item._id || item.productId || item.id || '',
                 name: product.name || 'Unknown Product',
@@ -77,7 +66,6 @@ export const CartSidebar = ({
                 image: product.image || '/placeholder-image.svg',
                 quantity: Number(item.quantity || 1)
               };
-              console.log('📝 Normalized item data:', itemData);
               return (
               <div key={itemData._id} className="border-b pb-6">
                 <div className="flex gap-4">
@@ -97,7 +85,6 @@ export const CartSidebar = ({
                       <h3 className="font-semibold text-sm text-gray-900">{itemData.name}</h3>
                       <button
                         onClick={() => {
-                          console.log('Removing item:', itemData._id);
                           onRemoveItem(itemData._id);
                         }}
                         className="text-red-500 hover:text-red-700 p-1"
@@ -111,7 +98,6 @@ export const CartSidebar = ({
                       <button
                         onClick={() => {
                           const newQuantity = itemData.quantity - 1;
-                          console.log('Decreasing quantity:', itemData._id, 'from', itemData.quantity, 'to', newQuantity);
                           if (newQuantity >= 1) {
                             onUpdateQuantity(itemData._id, newQuantity);
                           }
@@ -125,7 +111,6 @@ export const CartSidebar = ({
                       <button
                         onClick={() => {
                           const newQuantity = itemData.quantity + 1;
-                          console.log('Increasing quantity:', itemData._id, 'from', itemData.quantity, 'to', newQuantity);
                           onUpdateQuantity(itemData._id, newQuantity);
                         }}
                         className="p-1 hover:bg-gray-200 rounded"

@@ -43,7 +43,6 @@ export const ProductDetailPage = () => {
   // Find the specific product by ID
   const product = products.find(p => (p._id || p.id) === id);
 
-  console.log('Product data:', product); // Debug log
 
   if (isLoading) return <div className="p-10">Loading product...</div>;
   if (!product) return <div className="p-10">Product not found</div>;

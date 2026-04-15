@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import './index.css'
 import App from './App.tsx'
@@ -14,6 +14,7 @@ import { AuthProvider } from './contexts/AuthContext.tsx'
 import { AdminDashboard, OrdersPage, ProductsPage, CategoriesPage, CustomersPage } from './admin'
 import { AdminAddProduct } from './pages/admin/AdminAddProduct.tsx'
 import { CartsPage } from './admin/pages/CartsPage.tsx'
+import { AdminRoute } from './components/AdminRoute.tsx'
 
 
 // Create React Query client
@@ -52,14 +53,14 @@ createRoot(document.getElementById('root')!).render(
             {/* Customer dashboard */}
             <Route path="/dashboard" element={<CustomerDashboard />} />
             
-            {/* Admin routes */}
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/orders" element={<OrdersPage />} />
-            <Route path="/admin/products" element={<ProductsPage />} />
-            <Route path="/admin/products/add" element={<AdminAddProduct />} />
-            <Route path="/admin/categories" element={<CategoriesPage />} />
-            <Route path="/admin/carts" element={<CartsPage />} />
-            <Route path="/admin/customers" element={<CustomersPage />} />
+            {/* Admin routes - protected */}
+            <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+            <Route path="/admin/orders" element={<AdminRoute><OrdersPage /></AdminRoute>} />
+            <Route path="/admin/products" element={<AdminRoute><ProductsPage /></AdminRoute>} />
+            <Route path="/admin/products/add" element={<AdminRoute><AdminAddProduct /></AdminRoute>} />
+            <Route path="/admin/categories" element={<AdminRoute><CategoriesPage /></AdminRoute>} />
+            <Route path="/admin/carts" element={<AdminRoute><CartsPage /></AdminRoute>} />
+            <Route path="/admin/customers" element={<AdminRoute><CustomersPage /></AdminRoute>} />
             
             {/* Fallback empty route */}
             <Route path="/"></Route>

@@ -37,18 +37,12 @@ export const AdminCartManagement = () => {
   }, []);
 
   const handleUpdateQuantity = async (userId: string, productId: string, quantity: number) => {
-    // API call to update cart item
-    console.log('Update cart:', { userId, productId, quantity });
   };
 
   const handleRemoveItem = async (userId: string, productId: string) => {
-    // API call to remove cart item
-    console.log('Remove item:', { userId, productId });
   };
 
   const handleClearCart = async (userId: string) => {
-    // API call to clear user cart
-    console.log('Clear cart:', { userId });
   };
 
   return (

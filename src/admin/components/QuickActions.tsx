@@ -15,42 +15,42 @@ export const QuickActions = () => {
       description: 'Create new product listing',
       icon: <Plus size={20} />,
       color: 'bg-blue-500 hover:bg-blue-600',
-      onClick: () => console.log('Add product')
+      onClick: () => {}
     },
     {
       title: 'Manage Inventory',
       description: 'Update stock levels',
       icon: <Package size={20} />,
       color: 'bg-green-500 hover:bg-green-600',
-      onClick: () => console.log('Manage inventory')
+      onClick: () => {}
     },
     {
       title: 'View Customers',
       description: 'Customer management',
       icon: <Users size={20} />,
       color: 'bg-purple-500 hover:bg-purple-600',
-      onClick: () => console.log('View customers')
+      onClick: () => {}
     },
     {
       title: 'Analytics',
       description: 'Detailed reports',
       icon: <BarChart3 size={20} />,
       color: 'bg-orange-500 hover:bg-orange-600',
-      onClick: () => console.log('View analytics')
+      onClick: () => {}
     },
     {
       title: 'Generate Report',
       description: 'Export sales data',
       icon: <FileText size={20} />,
       color: 'bg-indigo-500 hover:bg-indigo-600',
-      onClick: () => console.log('Generate report')
+      onClick: () => {}
     },
     {
       title: 'Settings',
       description: 'System configuration',
       icon: <Settings size={20} />,
       color: 'bg-gray-500 hover:bg-gray-600',
-      onClick: () => console.log('Settings')
+      onClick: () => {}
     }
   ];
 
