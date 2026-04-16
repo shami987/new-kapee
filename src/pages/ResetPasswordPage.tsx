@@ -42,7 +42,7 @@ export const ResetPasswordPage = () => {
     resetPassword(
       { token, newPassword: password },
       {
-        onSuccess: (data) => {
+        onSuccess: (_data) => {
           setIsSuccess(true);
           setTimeout(() => navigate('/'), 3000);
         },

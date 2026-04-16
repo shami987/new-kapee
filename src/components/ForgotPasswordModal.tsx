@@ -33,7 +33,7 @@ export const ForgotPasswordModal = ({ isOpen, onClose, onBackToLogin }: ForgotPa
     forgotPassword(
       { email },
       {
-        onSuccess: (data) => {
+        onSuccess: (_data) => {
           setIsSuccess(true);
         },
         onError: (err: any) => {

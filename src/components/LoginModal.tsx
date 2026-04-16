@@ -92,7 +92,7 @@ export const LoginModal = ({ isOpen, onClose, onSwitchToSignup }: LoginModalProp
     login(
       { email, password },
       {
-        onSuccess: (data) => {
+        onSuccess: (_data) => {
           handleSuccessfulLogin();
         },
         onError: (err: any) => {

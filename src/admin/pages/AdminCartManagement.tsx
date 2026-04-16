@@ -36,13 +36,13 @@ export const AdminCartManagement = () => {
     setUserCarts(mockCarts);
   }, []);
 
-  const handleUpdateQuantity = async (userId: string, productId: string, quantity: number) => {
+  const handleUpdateQuantity = async (_userId: string, _productId: string, _quantity: number) => {
   };
 
-  const handleRemoveItem = async (userId: string, productId: string) => {
+  const handleRemoveItem = async (_userId: string, _productId: string) => {
   };
 
-  const handleClearCart = async (userId: string) => {
+  const handleClearCart = async (_userId: string) => {
   };
 
   return (

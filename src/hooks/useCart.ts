@@ -6,7 +6,7 @@ import type { CartItem, Product, Order, OrderItem } from '../types';
 import { ordersAPI } from '../services/api';
 
 export const useCart = () => {
-  const { isLoggedIn, user, token } = useAuth();
+  const { isLoggedIn } = useAuth();
   const queryClient = useQueryClient();
   
   // Local cart state for non-logged-in users

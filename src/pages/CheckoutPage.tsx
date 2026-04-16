@@ -1,14 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
-import { emailService } from '../services/emailService';
+import { paymentService } from '../services/paymentService';
 import { Header } from '../components/Header';
 import { StickyNav } from '../components/StickyNav';
 import { Footer } from '../components/Footer';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-export const CheckoutPage = () => {
+// Initialize Stripe
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+
+const CheckoutForm = () => {
   const navigate = useNavigate();
   const { cartItems, getTotalPrice, getTotalItems, checkout } = useCart();
+  const stripe = useStripe();
+  const elements = useElements();
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -25,7 +32,13 @@ export const CheckoutPage = () => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [clientSecret, setClientSecret] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Calculate totals - shipping cost is fixed
+  const shippingCost = 5.00;
+  const subtotal = getTotalPrice;
+  const total = subtotal + shippingCost;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -35,7 +48,26 @@ export const CheckoutPage = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Create payment intent when component mounts or total changes
+  useEffect(() => {
+    const currentTotal = getTotalPrice + shippingCost;
+    if (currentTotal > 0) {
+      createPaymentIntent();
+    }
+  }, [getTotalPrice, shippingCost]);
+
+  const createPaymentIntent = async () => {
+    try {
+      const currentTotal = getTotalPrice + shippingCost;
+      const response = await paymentService.createPaymentIntent(currentTotal);
+      setClientSecret(response.clientSecret);
+    } catch (error) {
+      console.error('Failed to create payment intent:', error);
+      setErrors({ submit: 'Failed to initialize payment. Please try again.' });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Validate form
@@ -55,52 +87,74 @@ export const CheckoutPage = () => {
       return;
     }
     
+    if (!stripe || !elements) {
+      setErrors({ submit: 'Payment system not ready. Please refresh.' });
+      return;
+    }
+    
     setErrors({});
-    (async () => {
-      setIsSubmitting(true);
-      try {
-        const shippingAddress = {
-          name: `${formData.firstName} ${formData.lastName}`.trim(),
-          line1: formData.address,
-          line2: formData.apartment || undefined,
-          city: formData.city,
-          postalCode: formData.zipCode,
-          country: formData.country,
-        };
+    setIsProcessing(true);
+    
+    try {
+      // First create the order
+      const shippingAddress = {
+        name: `${formData.firstName} ${formData.lastName}`.trim(),
+        line1: formData.address,
+        line2: formData.apartment || undefined,
+        city: formData.city,
+        postalCode: formData.zipCode,
+        country: formData.country,
+      };
 
-        const createdOrder = await checkout(shippingAddress);
-        
-        // Send order confirmation email
-        try {
-          await emailService.sendOrderConfirmation({
-            orderId: createdOrder._id || createdOrder.id,
-            email: formData.email,
-            customerName: `${formData.firstName} ${formData.lastName}`,
-            orderDetails: {
-              items: cartItems,
-              total: total,
-              subtotal: subtotal,
-              shipping: shippingCost,
-              shippingAddress
-            }
-          });
-        } catch (emailError) {
-          // Don't fail the order if email fails
-        }
-
-        // Navigate to order complete page and pass created order via state
-        setIsSubmitting(false);
-        navigate('/order-complete', { state: { order: createdOrder } });
-      } catch (err) {
-        setIsSubmitting(false);
-        setErrors({ submit: 'Failed to place order. Please try again.' });
+      const createdOrder = await checkout(shippingAddress);
+      
+      // Process payment with Stripe
+      const cardElement = elements.getElement(CardElement);
+      if (!cardElement) {
+        throw new Error('Card element not found');
       }
-    })();
-  };
 
-  const shippingCost = 5.00;
-  const subtotal = getTotalPrice;
-  const total = subtotal + shippingCost;
+      const { error: paymentError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: `${formData.firstName} ${formData.lastName}`,
+            email: formData.email,
+            phone: formData.phone,
+            address: {
+              line1: formData.address,
+              city: formData.city,
+              postal_code: formData.zipCode,
+              country: formData.country,
+            },
+          },
+        },
+      });
+
+      if (paymentError) {
+        throw new Error(paymentError.message);
+      }
+
+      if (paymentIntent.status === 'succeeded') {
+        // Confirm payment with backend
+        await paymentService.confirmPayment(
+          createdOrder._id || createdOrder.id,
+          paymentIntent.id,
+          formData.email
+        );
+
+        // Navigate to order complete page
+        navigate('/order-complete', { state: { order: createdOrder } });
+      } else {
+        throw new Error('Payment was not successful');
+      }
+    } catch (err: any) {
+      console.error('Checkout error:', err);
+      setErrors({ submit: err.message || 'Failed to place order. Please try again.' });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -373,12 +427,29 @@ export const CheckoutPage = () => {
                 </div>
               </div>
 
-              {/* Payment Notice */}
-              <div className="bg-blue-50 border border-blue-200 p-4 rounded mb-6 flex items-start">
-                <span className="text-blue-600 mr-3 text-lg">ℹ</span>
-                <span className="text-blue-600 text-xs">
-                  Sorry, it seems that there are no available payment methods. Please contact us if you require assistance or wish to make alternative arrangements.
-                </span>
+              {/* Payment Form */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Card Details <span className="text-red-500">*</span>
+                </label>
+                <div className="border border-gray-300 rounded p-3 bg-white">
+                  <CardElement
+                    options={{
+                      style: {
+                        base: {
+                          fontSize: '16px',
+                          color: '#424770',
+                          '::placeholder': {
+                            color: '#aab7c4',
+                          },
+                        },
+                        invalid: {
+                          color: '#9e2146',
+                        },
+                      },
+                    }}
+                  />
+                </div>
               </div>
 
               {/* Privacy Note */}
@@ -389,10 +460,10 @@ export const CheckoutPage = () => {
               {/* Place Order Button */}
               <button
                 onClick={handleSubmit}
-                disabled={isSubmitting}
+                disabled={isProcessing || !stripe || !elements}
                 className="w-full bg-orange-500 text-white py-3 rounded font-bold hover:bg-orange-600 transition-colors disabled:bg-orange-300 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'PLACING ORDER...' : 'PLACE ORDER'}
+                {isProcessing ? 'PROCESSING PAYMENT...' : 'PLACE ORDER'}
               </button>
             </div>
           </div>
@@ -401,6 +472,14 @@ export const CheckoutPage = () => {
       
       <Footer />
     </div>
+  );
+};
+
+export const CheckoutPage = () => {
+  return (
+    <Elements stripe={stripePromise}>
+      <CheckoutForm />
+    </Elements>
   );
 };
 
